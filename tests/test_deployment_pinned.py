@@ -17,10 +17,12 @@ These tests cover:
 
 
 import hashlib
+import socket
 import threading
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
@@ -196,3 +198,74 @@ def test_500_response_is_not_retried() -> None:
         assert len(attempts) == 1
     finally:
         stop_server(server)
+
+
+def test_connection_failures_are_retried_until_the_request_succeeds() -> None:
+    attempts: list[int] = []
+
+    class Ok(BaseHTTPRequestHandler):
+        def do_POST(self) -> None:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"ok")
+
+        def log_message(self, *_args: Any) -> None:
+            return
+
+    server, port = start_server(Ok)
+    real_create_connection = socket.create_connection
+
+    def flaky_create_connection(address: tuple[str, int], timeout: float) -> Any:
+        attempts.append(1)
+        if len(attempts) <= 2:
+            raise OSError("temporary connection refusal")
+        return real_create_connection(address, timeout)
+
+    try:
+        client = Client(
+            allow_loopback=True, max_retries=2, retry_backoff=0
+        )
+        manifest = patched_created_at(make_manifest())
+        with patch(
+            "cedrus.deploy.socket.create_connection",
+            side_effect=flaky_create_connection,
+        ):
+            record = client.deploy_http(manifest, f"http://127.0.0.1:{port}/cedar")
+        assert record.status == "deployed"
+        assert record.response["retry_count"] == "2"
+        assert len(attempts) == 3
+    finally:
+        stop_server(server)
+
+
+def test_response_timeouts_are_retried_to_the_configured_limit() -> None:
+    sockets: list[Any] = []
+
+    class TimeoutSocket:
+        def settimeout(self, _timeout: float) -> None:
+            return
+
+        def sendall(self, _data: bytes) -> None:
+            return
+
+        def recv(self, _size: int) -> bytes:
+            raise TimeoutError("temporary read timeout")
+
+        def close(self) -> None:
+            return
+
+    def timeout_connection(_address: tuple[str, int], timeout: float) -> TimeoutSocket:
+        del timeout
+        sock = TimeoutSocket()
+        sockets.append(sock)
+        return sock
+
+    client = Client(allow_loopback=True, max_retries=2, retry_backoff=0)
+    manifest = patched_created_at(make_manifest())
+    with patch(
+        "cedrus.deploy.socket.create_connection",
+        side_effect=timeout_connection,
+    ), pytest.raises(Deploy, match="deployment response timed out"):
+        client.deploy_http(manifest, "http://127.0.0.1:1/cedar")
+    assert len(sockets) == 3
