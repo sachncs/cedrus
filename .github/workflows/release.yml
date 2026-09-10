@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    name: Test on tag (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Verify tag matches package version
+        run: |
+          python -c "
+          import re, sys
+          tag = '${{ github.ref_name }}'.lstrip('v')
+          sys.path.insert(0, 'cedrus')
+          from cedrus import __version__ as pkg_version
+          if pkg_version != tag:
+              print(f'tag {tag} does not match package version {pkg_version}', file=sys.stderr)
+              sys.exit(1)
+          "
+      - name: Install package
+        run: pip install -e ".[test]"
+      - name: Run pytest with coverage
+        run: pytest --cov=cedrus --cov-fail-under=87
+
+  publish:
+    name: Build, sign, and publish to PyPI
+    needs: test
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Build distribution
+        run: |
+          python -m pip install build
+          python -m build
+      - name: Generate CycloneDX SBOM
+        run: |
+          python -m pip install cyclonedx-bom
+          cyclonedx-py environment -o dist/sbom.cdx.json
+      - name: Sign wheel with sigstore cosign
+        uses: sigstore/cosign-installer@main
+        with:
+          cosign-release: "v2.4.1"
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: true
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/sbom.cdx.json
+            dist/*.sig

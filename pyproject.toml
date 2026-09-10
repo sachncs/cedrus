@@ -1,0 +1,125 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cedrus"
+dynamic = ["version"]
+description = "Compile organizational authorization intent into validated Cedar policies."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Sachin", email = "sachncs@gmail.com" },
+]
+requires-python = ">=3.11"
+keywords = ["cedar", "authorization", "policy", "policy-as-code", "iam"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Security :: Authorization",
+    "Typing :: Typed",
+]
+dependencies = [
+    "cedarpy>=4.8.7,<5",
+    "httpx>=0.27,<1",
+    "litellm>=1,<2",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "pytest-httpx>=0.30",
+]
+
+[project.urls]
+Homepage = "https://github.com/sachin/cedrus"
+Source = "https://github.com/sachin/cedrus"
+Issues = "https://github.com/sachin/cedrus/issues"
+Changelog = "https://github.com/sachin/cedrus/blob/main/CHANGELOG.md"
+Security = "https://github.com/sachin/cedrus/blob/main/SECURITY.md"
+
+[project.scripts]
+cedrus = "cedrus.cli:main"
+
+[tool.setuptools]
+packages = [
+    "cedrus",
+    "cedrus.policies",
+    "cedrus.generate",
+    "cedrus.store",
+    "cedrus.data",
+]
+
+[tool.setuptools.package-data]
+cedrus = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = {attr = "cedrus.__version__"}
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812",   # missing-trailing-comma (conflict with formatter)
+    "ISC001",   # single-line-implicit-string-concatenation (conflict with formatter)
+    "D203",     # one-blank-line-before-class (incompatible with D211)
+    "D213",     # multi-line-summary-second-line (incompatible with D212)
+    "EM101",    # exception-message-inherit (false positives on dataclass)
+    "EM102",    # exception-message-inherit (false positives on dataclass)
+    "TRY003",   # raise-vanilla-args (we use exceptions with explicit messages)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ANN",      # tests don't need annotations
+    "D",        # tests don't need docstrings
+    "PLR2004",  # magic values in tests are fine
+    "S",        # security in tests is not enforced
+    "ARG",      # unused arguments in fixtures
+    "FBT",      # boolean defaults in fixtures
+]
+"examples/*" = [
+    "ANN",
+    "D",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+files = ["cedrus"]
+python_version = "3.11"
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["cedarpy", "litellm"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Tests are not type-checked strictly. Test code is allowed to use
+# untyped fixtures, dynamic stubs, and SimpleNamespace / cast()
+# shims. Type-correctness for tests is enforced at the import
+# boundary (the production code), not at every fixture call.
+directory = "tests"
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disable_error_code = ["no-untyped-def", "no-untyped-call"]
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "integration: tests that require SQLite or external resources",
+]

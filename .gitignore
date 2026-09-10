@@ -1,0 +1,45 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# Workspace runtime storage: SQLite database plus SQLite write-ahead log
+# files produced by cedar-intent at runtime. The directory is created by
+# ``cedar-intent init`` and must never be committed because it contains
+# deployment history and per-deployment secrets (for example, deployment
+# response bodies captured during HTTP pushes).
+.cedar-intent/
+.cedar-intent/*
+
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+
+*.log
+.DS_Store
