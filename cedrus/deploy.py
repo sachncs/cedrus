@@ -719,6 +719,10 @@ class Pin:
     family: int
 
 
+class _RetryableTransportError(Deploy):
+    """A pinned transport failure that is safe for the client to retry."""
+
+
 class Transport(httpx.BaseTransport):
     """An :mod:`httpx` transport that pins each connection to a resolved IP.
 
@@ -778,7 +782,7 @@ class Transport(httpx.BaseTransport):
                 (self.pinned.ip, self.pinned.port), timeout=timeout
             )
         except OSError as error:
-            raise Deploy(
+            raise _RetryableTransportError(
                 f"deployment connection to pinned "
                 f"{self.pinned.ip}:{self.pinned.port} failed: {error}"
             ) from error
@@ -790,7 +794,7 @@ class Transport(httpx.BaseTransport):
                         sock, server_hostname=self.pinned.host
                     )
                 except OSError as error:
-                    raise Deploy(
+                    raise _RetryableTransportError(
                         f"deployment TLS handshake to "
                         f"{self.pinned.host} failed: {error}"
                     ) from error
@@ -859,7 +863,7 @@ class Transport(httpx.BaseTransport):
             try:
                 chunk = sock.recv(4096)
             except TimeoutError as error:
-                raise Deploy(
+                raise _RetryableTransportError(
                     f"deployment response timed out after {timeout}s"
                 ) from error
             if not chunk:
@@ -1154,6 +1158,15 @@ class Client:
                         f"deployment to {url} rejected with status "
                         f"{response.status_code} (body sha256={response_sha[:16]}…)"
                     )
+            except _RetryableTransportError as error:
+                last_error = error
+                if attempt >= self.max_retries:
+                    raise
+                attempt += 1
+                if backoff > 0:
+                    time.sleep(backoff)
+                backoff = min(backoff * 2, 8.0)
+                continue
             except httpx.HTTPError as error:
                 last_error = Deploy(
                     f"deployment request failed: {error}"
