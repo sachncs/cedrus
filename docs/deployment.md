@@ -118,14 +118,16 @@ cedrus deploy push \
 
 > **WARNING — redirect handling.** HTTP redirects are **disabled**
 > by default. A `3xx` response is treated as a deployment failure.
-> The SSRF guard is re-applied on every hop when redirects are
-> enabled (via the `Client(follow_redirects=True)` Python option);
-> operators should prefer a single direct endpoint.
+> The client pins only the initial target IP at SSRF-check time;
+> the underlying `httpx` client does not re-validate the redirect
+> host against the guard when `follow_redirects=True`. Operators
+> should prefer a single direct endpoint.
 
 > **WARNING — body capture.** The HTTP response body is never
 > embedded in error messages or persisted verbatim in the deployment
-> record. Only a SHA-256 of the body is retained. If you need to
-> inspect the body, capture it on the server side instead.
+> record. Only a SHA-256 of the body is retained
+> (`Record.response["body_sha256"]`). If you need to inspect the
+> body, capture it on the server side instead.
 
 > **WARNING — bundle integrity.** The SHA-256 hash in the manifest
 > provides **corruption detection only**. An attacker who can replace
@@ -184,12 +186,13 @@ deployed bundle and redeploy an earlier bundle from your backup.
 | ---------------------------------------- | ----------------------------------------------- |
 | Local directory unwritable               | `Deploy` raised before any write.              |
 | Symlinked target directory               | `Deploy` raised (refuse to traverse symlinks).  |
-| HTTP endpoint returns non-2xx            | `Deploy` raised; response body captured.       |
+| HTTP endpoint returns non-2xx            | `Deploy` raised; only the response SHA-256 is retained. |
 | HTTP timeout                             | `Deploy` raised; underlying `TimeoutError` chained. |
 | Header injection (CR/LF / reserved name) | `Deploy` raised at validate_headers.           |
 | Cedar schema mismatch (downstream)       | Surfaced by the consuming service; cedrus does not catch this. |
 
-Always inspect the captured response body in `Record.response`
-when investigating HTTP deployment failures. The body is only the
-HTTP status code, a SHA-256 of the body, the idempotency key, and
-the retry count — not the full body.
+When investigating HTTP deployment failures, rely on the response
+metadata stored on `Record.response` (`status_code`, `body_sha256`,
+`idempotency_key`, `retry_count`). The response body itself is
+deliberately not captured or surfaced; capture it on the server
+side if you need it.
