@@ -1,5 +1,12 @@
 # cedrus → cedrus: 0.7.0 full rebuild plan
 
+> **Historical.** This document is the planning ledger for the
+> pre-0.7.0 rebuild. The work it describes is complete: the
+> package is now `cedrus`, the data model is typed end-to-end, and
+> 0.7.0 is the first release after the rewrite. The text below is
+> retained for archaeology and is no longer the authoritative
+> plan. Open questions belong in issues, not here.
+
 This document enumerates **254 atomic commits** that together rename the
 package from `cedrus` to `cedrus`, enforce single-word naming,
 build a polymorphic OOP architecture, and replace every string/dict
