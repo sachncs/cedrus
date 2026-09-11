@@ -249,7 +249,8 @@ default principal / action / resource is `any` for every subcommand.
 | ------------------ | ------------------------------------------------ |
 | `--principal`      | `any`, `type`, `specific`, `in_group`, `is_type` |
 | `--principal-type` | Type name (when kind is `type`, `is_type`, …)    |
-| `--entity-id`      | Entity id (when kind is `specific`)              |
+| `--principal-id`   | Principal entity id (when kind is `specific`)    |
+| `--entity-id`      | Deprecated alias for `--principal-id`            |
 | `--group-type`     | Group type (when kind is `in_group`)             |
 | `--group-id`       | Group id (when kind is `in_group`)               |
 
@@ -267,16 +268,17 @@ default principal / action / resource is `any` for every subcommand.
 | ------------------ | ------------------------------------------------ |
 | `--resource`       | `any`, `type`, `specific`, `in_parent`, `is_type` |
 | `--resource-type`  | Resource type name                              |
-| `--entity-id`      | Entity id (when kind is `specific`)              |
+| `--resource-id`    | Resource entity id (when kind is `specific`)     |
+| `--entity-id`      | Deprecated alias for `--resource-id`             |
 | `--parent-type`    | Parent type (when kind is `in_parent`)            |
 | `--parent-id`      | Parent id (when kind is `in_parent`)              |
 
-> **Note on `--entity-id`.** Both the principal and resource scopes
-> accept `--entity-id`. When the two scopes are supplied on the same
-> command, argparse binds whichever value appears last on the
-> command line to both. The CLI does not currently distinguish
-> `principal-entity-id` and `resource-entity-id`; provide distinct
-> flags if you need them.
+> **Note on `--entity-id`.** Pre-0.7.0 callers used a single
+> `--entity-id` that was bound to whichever entity id matched the
+> last occurrence on the command line. The CLI now distinguishes
+> `--principal-id` and `--resource-id`; `--entity-id` is kept as a
+> deprecated alias and is treated as `--principal-id` (and as
+> `--resource-id` if `--resource-id` is not given).
 
 ## Environment variables
 
