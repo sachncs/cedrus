@@ -86,3 +86,8 @@ jobs:
           test -f docs/python-api.md
           test -f docs/deployment.md
           test -f docs/verification.md
+      - name: Verify Markdown links resolve to existing files
+        run: |
+          python scripts/check_markdown_links.py README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md SUPPORT.md \
+            docs/architecture.md docs/cli.md docs/python-api.md docs/deployment.md docs/verification.md \
+            examples/README.md
