@@ -160,8 +160,11 @@ pip install cedrus
 ```
 
 **Requirements**: Python 3.11+ (see `pyproject.toml`). The runtime
-dependencies are `cedarpy` (the official Python binding to the Cedar
-policy engine) and `litellm` (the LLM provider abstraction).
+dependencies declared in `pyproject.toml` are:
+
+- `cedarpy` (the Python binding to the Cedar policy engine),
+- `httpx` (HTTP client used by `Client` and the DNS-pinned transport), and
+- `litellm` (the LLM provider abstraction).
 
 ---
 
@@ -502,7 +505,7 @@ Until then, install from a clone with
 | Lint/Format | [ruff](https://docs.astral.sh/ruff/) |
 | Type-check | [mypy](https://mypy-lang.org/) (relaxed strict) |
 | Releases | [GitHub Actions](https://github.com/features/actions) + [PyPI trusted publishing](https://docs.pypi.org/trusted-publishers/) + [sigstore cosign](https://www.sigstore.dev/) |
-| Containerization | Docker (multi-stage) |
+| Containerization | _(not shipped — there is no `Dockerfile` in the repo; install with `pip` instead.)_ |
 
 ---
 
