@@ -26,7 +26,6 @@ Attributes:
 
 from __future__ import annotations
 
-import json
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -186,7 +185,7 @@ class Intent:
         return cls(
             id=str(data.get("id", "")),
             requirement_id=str(data.get("requirement_id", "")),
-            effect=cast(Effect, str(data.get("effect", "permit"))),
+            effect=cast("Effect", str(data.get("effect", "permit"))),
             principal=principal,
             action=action,
             resource=resource,
@@ -458,4 +457,4 @@ class Source:
         }
 
 
-__all__ = ["Source", "Effect", "Intent"]
+__all__ = ["Effect", "Intent", "Source"]

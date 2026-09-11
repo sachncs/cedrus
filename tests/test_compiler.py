@@ -18,7 +18,6 @@ from cedrus.compile import Intent, Source
 from cedrus.error import Compile
 from cedrus.scope import Action, Clause, Principal, Resource
 
-
 # ---------------------------------------------------------------------------
 # Intent data modelling
 # ---------------------------------------------------------------------------
@@ -42,13 +41,13 @@ def make_intent(**overrides) -> Intent:
     kwargs.update(overrides)
     if "effect" in overrides:
         from cedrus.compile import Effect
-        kwargs["effect"] = cast(Effect, kwargs["effect"])
+        kwargs["effect"] = cast("Effect", kwargs["effect"])
     if "principal" in overrides:
-        kwargs["principal"] = cast(Principal, kwargs["principal"])
+        kwargs["principal"] = cast("Principal", kwargs["principal"])
     if "action" in overrides:
-        kwargs["action"] = cast(Action, kwargs["action"])
+        kwargs["action"] = cast("Action", kwargs["action"])
     if "resource" in overrides:
-        kwargs["resource"] = cast(Resource, kwargs["resource"])
+        kwargs["resource"] = cast("Resource", kwargs["resource"])
     return Intent(**kwargs)
 
 
@@ -58,7 +57,7 @@ def test_intent_rejects_invalid_effect() -> None:
     from cedrus.compile import Effect
 
     with pytest.raises(Compile):
-        make_intent(effect=cast(Effect, "deny"))
+        make_intent(effect=cast("Effect", "deny"))
 
 
 def test_intent_rejects_empty_id() -> None:
@@ -91,7 +90,7 @@ def test_intent_is_frozen() -> None:
         # The mypy type checker considers the field read-only, so
         # we use a try/except at the attribute level that mypy
         # doesn't flag because it sees a runtime expression.
-        setattr(intent, "effect", "forbid")
+        intent.effect = "forbid"
 
 
 # ---------------------------------------------------------------------------
@@ -162,9 +161,9 @@ def test_compile_omits_when_block_when_empty() -> None:
 def test_to_dict_carries_id_and_three_scopes() -> None:
     intent = make_intent()
     payload = intent.to_dict()
-    principal_dict = cast(dict, payload["principal"])
-    action_dict = cast(dict, payload["action"])
-    resource_dict = cast(dict, payload["resource"])
+    principal_dict = cast("dict", payload["principal"])
+    action_dict = cast("dict", payload["action"])
+    resource_dict = cast("dict", payload["resource"])
     assert payload["id"] == "hr-hr-001"
     assert payload["requirement_id"] == "hr-001"
     assert payload["effect"] == "permit"
@@ -244,7 +243,7 @@ def test_from_dict_raises_on_non_dict() -> None:
     from typing import cast
 
     with pytest.raises(Compile):
-        Intent.from_dict(cast(dict, "not a dict"))
+        Intent.from_dict(cast("dict", "not a dict"))
 
 
 # ---------------------------------------------------------------------------
@@ -292,7 +291,7 @@ def test_parse_raises_on_non_dict() -> None:
     from typing import cast
 
     with pytest.raises(Compile):
-        Intent.parse(cast(dict, 42), generator_name="offline")
+        Intent.parse(cast("dict", 42), generator_name="offline")
 
 
 def test_parse_sql_shape_carries_note_records() -> None:
@@ -365,9 +364,10 @@ def test_to_data_includes_intent_notes_rows() -> None:
 
 
 def test_parse_llm_shape_with_need_uses_need_domain_in_id() -> None:
-    from cedrus.need import Need
     from datetime import UTC, datetime
     from pathlib import Path
+
+    from cedrus.need import Need
 
     need = Need(
         id="HR-042",

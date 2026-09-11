@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import argparse
 import json
+from argparse import Namespace
 from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
 from unittest.mock import patch
-
-from argparse import Namespace
 
 import pytest
 
@@ -626,8 +625,9 @@ def test_non_negative_int_rejects_negative() -> None:
 
 
 def test_non_negative_int_rejects_non_integer() -> None:
-    from cedrus.cli import non_negative_int
     import argparse
+
+    from cedrus.cli import non_negative_int
     with pytest.raises(argparse.ArgumentTypeError):
         non_negative_int("3.14")
 
@@ -663,16 +663,16 @@ def test_main_module_routes_to_cli_main() -> None:
 def test_report_error_returns_one() -> None:
     from cedrus.cli import report_error
 
-    args = cast(Namespace, SimpleNamespace(json=False, workspace=None, command="init", path="."))
-    result = report_error(args, cast(cedrus.error.Error, RuntimeError("boom")))
+    args = cast("Namespace", SimpleNamespace(json=False, workspace=None, command="init", path="."))
+    result = report_error(args, cast("cedrus.error.Error", RuntimeError("boom")))
     assert result == 1
 
 
 def test_report_error_emits_json_envelope_when_json_flag_set(capsys) -> None:
     from cedrus.cli import report_error
 
-    args = cast(Namespace, SimpleNamespace(json=True, workspace=None, command="init", path="."))
-    result = report_error(args, cast(cedrus.error.Error, RuntimeError("boom")))
+    args = cast("Namespace", SimpleNamespace(json=True, workspace=None, command="init", path="."))
+    result = report_error(args, cast("cedrus.error.Error", RuntimeError("boom")))
     captured = capsys.readouterr()
     assert result == 1
     assert "boom" in captured.err
@@ -681,8 +681,8 @@ def test_report_error_emits_json_envelope_when_json_flag_set(capsys) -> None:
 def test_report_unexpected_error_returns_one(capsys) -> None:
     from cedrus.cli import report_unexpected_error
 
-    args = cast(Namespace, SimpleNamespace(json=False, workspace=None, command="init", path="."))
-    result = report_unexpected_error(args, cast(cedrus.error.Error, ValueError("kaboom")))
+    args = cast("Namespace", SimpleNamespace(json=False, workspace=None, command="init", path="."))
+    result = report_unexpected_error(args, cast("cedrus.error.Error", ValueError("kaboom")))
     assert result == 1
     captured = capsys.readouterr()
     assert "kaboom" in captured.err

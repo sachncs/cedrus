@@ -42,17 +42,21 @@ See Also:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from cedrus.case import Case, Run, Suite
 from cedrus.compile import Intent
 from cedrus.error import Fault
-from cedrus.need import Need
-from cedrus.schema import Schema
 from cedrus.scope import Action, Principal, Resource
 from cedrus.validate import Validator, Vreport
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from cedrus.need import Need
+    from cedrus.schema import Schema
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,7 +156,7 @@ class Kind(ABC):
         self,
         schema: Schema,
         scenarios: Sequence[Case],
-        entities: list[Mapping[str, object]] | None = None,
+        entities: list[Mapping[str, object]] | None = None,  # noqa: ARG002 - wired in #17
     ) -> Suite:
         """Run authorization scenarios through the Cedar engine.
 

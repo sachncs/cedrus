@@ -8,7 +8,7 @@ malformed JSON, non-object files, action groups with no members).
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -16,6 +16,8 @@ from cedrus import Schema
 from cedrus.error import Validate
 from cedrus.schema import qualify
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Schema.from_mapping / from_json_file

@@ -37,19 +37,22 @@ See Also:
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from cedrus.compile import Intent, Source
 from cedrus.data import Notes
 from cedrus.error import Fault
 from cedrus.generate import Context, Generator, Proposal, Result
-from cedrus.need import Need
-from cedrus.schema import Schema
-from cedrus.scope import Action, Principal, Resource
 from cedrus.policies.base import Kind
+from cedrus.scope import Action, Principal, Resource
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from cedrus.need import Need
+    from cedrus.schema import Schema
 
 DraftStatus = str  # "proposed" | "accepted" | "rejected"
 
@@ -76,9 +79,9 @@ class Draft(Kind):
         request_id: Provider-supplied request identifier (if any).
     """
 
-    principal: Principal = field(default_factory=lambda: Principal())
-    action: Action = field(default_factory=lambda: Action())
-    resource: Resource = field(default_factory=lambda: Resource())
+    principal: Principal = field(default_factory=Principal)
+    action: Action = field(default_factory=Action)
+    resource: Resource = field(default_factory=Resource)
     intent: Intent | None = None
     unresolved: tuple[str, ...] = field(default_factory=tuple)
     status: DraftStatus = "proposed"
@@ -198,7 +201,7 @@ class Draft(Kind):
             notes=Notes.from_dict(merged),
         )
 
-    def compile(self, schema: Schema | None = None) -> Source:
+    def compile(self, schema: Schema | None = None) -> Source:  # noqa: ARG002 - reserved for typed compile
         """Compile this draft's intent (or build one from scopes) to Cedar source.
 
         If the draft already has an intent, the compiler renders that

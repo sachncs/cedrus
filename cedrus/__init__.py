@@ -103,6 +103,7 @@ from __future__ import annotations
 
 from cedrus.case import Case, Outcome, Run, Suite
 from cedrus.compile import Intent, Source
+from cedrus.data import Payload
 from cedrus.deploy import (
     Bundler,
     Client,
@@ -140,7 +141,6 @@ from cedrus.schema import Schema
 from cedrus.scope import Action, Clause, Principal, Resource, Scope
 from cedrus.space import Space
 from cedrus.store import Backend, Memory, Repository
-from cedrus.data import Payload
 from cedrus.validate import Validator, Vreport
 from cedrus.verify import Extraction, Finding, Report, Verifier
 
@@ -181,6 +181,7 @@ __all__ = [
     "Principal",
     "Proposal",
     "Record",
+    "Report",
     "Repository",
     "Require",
     "Resource",
@@ -190,6 +191,7 @@ __all__ = [
     "Scope",
     "ScopeFault",
     "Source",
+    "Space",
     "SpaceError",
     "Store",
     "Suite",
@@ -198,6 +200,5 @@ __all__ = [
     "Validator",
     "Verifier",
     "Vreport",
-    "Space",
     "__version__",
 ]

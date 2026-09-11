@@ -55,17 +55,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from cedrus.compile import Intent
 from cedrus.data import Payload
-from cedrus.deploy import Record
 from cedrus.error import Store
-from cedrus.need import Need
 from cedrus.scope import Action, Principal, Resource
-
-if TYPE_CHECKING:
-    from .sqlite import Backend
 
 
 @dataclass(frozen=True, slots=True)
@@ -227,7 +222,7 @@ class Stored:
         repo: Repository,
         *,
         domain: str | None = None,
-    ) -> "list[Stored]":
+    ) -> list[Stored]:
         """All policies, optionally filtered by ``domain``.
 
         Args:
@@ -529,7 +524,7 @@ class DraftStored:
         repo: Repository,
         *,
         policy_id: str | None = None,
-    ) -> "list[DraftStored]":
+    ) -> list[DraftStored]:
         """All drafts, optionally filtered by ``policy_id``.
 
         Args:

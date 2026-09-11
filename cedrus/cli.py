@@ -47,21 +47,24 @@ import math
 import os
 import sys
 from argparse import Namespace, _SubParsersAction
-from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from cedrus import Error, Llm, Offline, Space
-from cedrus.case import Case
 from cedrus.error import Config
 from cedrus.scope import Action, Principal, Resource
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from cedrus.case import Case
 
 ONLINE_ENV_VAR = "CEDAR_INTENT_ONLINE"
 MODEL_ENV_VAR = "CEDAR_INTENT_MODEL"
 
 
 def positive_finite_float(value: str) -> float:
-    """argparse type for positive finite floats (reject inf/nan/<=0)."""
+    """Argparse type for positive finite floats (reject inf/nan/<=0)."""
     try:
         number = float(value)
     except ValueError as error:
@@ -74,7 +77,7 @@ def positive_finite_float(value: str) -> float:
 
 
 def non_negative_int(value: str) -> int:
-    """argparse type for non-negative integers."""
+    """Argparse type for non-negative integers."""
     try:
         number = int(value)
     except ValueError as error:
@@ -87,7 +90,7 @@ def non_negative_int(value: str) -> int:
 
 
 def positive_int(value: str) -> int:
-    """argparse type for positive integers."""
+    """Argparse type for positive integers."""
     number = non_negative_int(value)
     if number <= 0:
         raise argparse.ArgumentTypeError(
@@ -534,7 +537,7 @@ def command_policy(workspace: Space, args: Namespace) -> Any:
     return handler(workspace, args, schema)
 
 
-def policy_draft(workspace: Space, args: Namespace, schema: Any) -> Any:
+def policy_draft(workspace: Space, args: Namespace, schema: Any) -> Any:  # noqa: ARG001
     """``policy draft`` subcommand handler."""
     draft = workspace.create_draft(
         args.requirement_id,
@@ -955,7 +958,7 @@ def humanize(payload: Any) -> str:
         return json.dumps(payload, indent=2, default=str)
     for predicate, render in HUMANIZERS:
         if predicate(payload):
-            return cast(str, render(payload))
+            return cast("str", render(payload))
     return json.dumps(payload, indent=2, default=str)
 
 

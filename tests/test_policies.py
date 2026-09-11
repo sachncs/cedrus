@@ -23,8 +23,6 @@ from cedrus import (
     Principal,
     Resource,
     Source,
-    Validator,
-    Vreport,
 )
 from cedrus.error import Fault
 from cedrus.policies.draft import DraftStatus
@@ -466,7 +464,8 @@ def test_draft_generate_skips_existing_policies_that_cant_be_intented() -> None:
 
 def test_draft_apply_result_merges_notes() -> None:
     from cedrus.data import Notes, Unresolved, Usage
-    from cedrus.generate import Proposal, Result as GenResult
+    from cedrus.generate import Proposal
+    from cedrus.generate import Result as GenResult
 
     base = Draft(
         id="hr",

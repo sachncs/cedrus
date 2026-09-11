@@ -10,14 +10,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from pathlib import Path
 
-import pytest
-
 from cedrus import (
-    Action,
-    Intent,
     Need,
-    Principal,
-    Resource,
     Verifier,
 )
 

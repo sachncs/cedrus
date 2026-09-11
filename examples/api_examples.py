@@ -89,8 +89,7 @@ def recipe_compile() -> None:
         action=Action(kind="named", name="viewPhoto", namespace="PhotoFlash"),
         resource=Resource(kind="is_type", type_name="PhotoFlash::Photo"),
     )
-    source = intent.compile()
-    print("compile ->", source.cedar.replace("\n", " "))
+    intent.compile()
 
 
 def recipe_validate() -> None:
@@ -100,8 +99,7 @@ def recipe_validate() -> None:
         'action == PhotoFlash::Action::"viewPhoto", '
         'resource is PhotoFlash::Photo);'
     )
-    report = Validator(make_schema()).validate([cedar])
-    print("validate ->", report.passed, report.formatted)
+    Validator(make_schema()).validate([cedar])
 
 
 def recipe_offline_generator() -> Draft:
@@ -117,8 +115,7 @@ def recipe_offline_generator() -> Draft:
         action=Action(kind="named", name="viewPhoto", namespace="PhotoFlash"),
         resource=Resource(kind="is_type", type_name="PhotoFlash::Photo"),
     )
-    proposal = draft.generate(schema, Offline())
-    print("offline_generator ->", proposal.intent.effect, proposal.unresolved)
+    draft.generate(schema, Offline())
     return draft
 
 
@@ -154,26 +151,19 @@ def recipe_run(cedar: str) -> None:
             expected="Deny",
         ),
     ]
-    report = Run(scenarios).evaluate(schema, [cedar])
-    print("run ->", report.passed, [(r.scenario.name, r.actual) for r in report.results])
+    Run(scenarios).evaluate(schema, [cedar])
 
 
 def recipe_verify(policies: list, requirement_ids: list) -> Report:
     """Run static verification on the compiled policies."""
     schema = make_schema()
-    report = Verifier(schema).verify(
+    return Verifier(schema).verify(
         policies,
         requirement_ids=requirement_ids,
         action_names=sorted(schema.action_names()),
         entity_type_names=sorted(schema.entity_type_names()),
         domain="hr",
     )
-    print(
-        "verify ->",
-        report.passed,
-        [(f.kind, f.message) for f in report.findings],
-    )
-    return report
 
 
 def recipe_deployment(workspace: Space) -> None:
@@ -182,14 +172,6 @@ def recipe_deployment(workspace: Space) -> None:
     manifest = workspace.build_bundle("hr", metadata={"channel": "staging"})
     target = Path("/tmp/cedrus-example/dist")
     workspace.write_bundle(manifest, target)
-    print(
-        "deployment ->",
-        target,
-        "hash=",
-        manifest.bundle_hash,
-        "policies=",
-        list(manifest.policy_ids),
-    )
 
 
 def main() -> None:
@@ -197,25 +179,17 @@ def main() -> None:
     workspace.init_domain("hr")
     workspace.repository.add_requirement(make_requirement("HR-042", "..."))
 
-    print("== compile ==")
     recipe_compile()
-    print("== validate ==")
     recipe_validate()
-    print("== offline_generator ==")
-    draft = recipe_offline_generator()
-    print("== litellm_generator_factory ==")
-    generator = recipe_litellm_generator_factory()
-    print("litellm_generator ->", generator.model, generator.fallbacks)
-    print("== run ==")
+    recipe_offline_generator()
+    recipe_litellm_generator_factory()
     cedar = (
         'permit (principal is PhotoFlash::User, '
         'action == PhotoFlash::Action::"viewPhoto", '
         'resource is PhotoFlash::Photo);'
     )
     recipe_run(cedar)
-    print("== verify ==")
     recipe_verify([], ["HR-042"])
-    print("== deployment ==")
     recipe_deployment(workspace)
 
 

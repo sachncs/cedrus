@@ -16,12 +16,14 @@ Attributes:
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from cedrus.error import Space
 from cedrus.need import Need
 from cedrus.policies import Existing
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Domain:
@@ -139,7 +141,7 @@ class Domain:
         }
 
     @classmethod
-    def create(cls, name: str, root: Path) -> "Domain":
+    def create(cls, name: str, root: Path) -> Domain:
         """Create a new domain directory and return an empty Domain.
 
         Args:
@@ -171,7 +173,7 @@ class Domain:
         name: str,
         root: Path,
         schema: Any | None = None,
-    ) -> "Domain":
+    ) -> Domain:
         """Load an existing domain.
 
         Args:
@@ -199,8 +201,6 @@ class Domain:
         file is logged and skipped so one bad requirement doesn't
         take the whole domain down.
         """
-        from datetime import datetime as _dt
-
         needs: list[Need] = []
         if self.requirements_dir.exists():
             for path in sorted(self.requirements_dir.glob("*.md")):
@@ -208,8 +208,7 @@ class Domain:
                     needs.append(
                         Need.from_markdown(path, workspace_root=self.root)
                     )
-                except Exception as ex:  # noqa: BLE001
-                    print(f"DEBUG: need ERR {path}: {type(ex).__name__}: {ex}")
+                except Exception:
                     continue
         self.needs = needs
 
@@ -225,12 +224,12 @@ class Domain:
                                 text=f"Imported from {path.name}",
                                 domain=self.name,
                                 source_path=path,
-                                created_at=_dt.now(UTC),
+                                created_at=datetime.now(UTC),
                             ),
                             cedar=cedar,
                         )
                     )
-                except Exception:  # noqa: BLE001
+                except Exception:
                     continue
         self.policies = policies
 

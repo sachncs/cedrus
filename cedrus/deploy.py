@@ -68,11 +68,13 @@ Attributes:
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import ipaddress
 import json
-import os
 import math
+import os
+import shutil
 import socket
 import ssl
 import tempfile
@@ -91,7 +93,7 @@ from cedrus.policies import Compiled, Kind
 from cedrus.utils import id
 
 if TYPE_CHECKING:
-    from cedrus.store import Backend, Repository
+    from cedrus.store import Repository
 
 DEPLOYMENT_KIND_LOCAL = "local"
 DEPLOYMENT_KIND_HTTP = "http"
@@ -225,7 +227,7 @@ class Record:
             ],
         }
 
-    def save(self, repo: "Repository") -> None:
+    def save(self, repo: Repository) -> None:
         """Persist this deployment (insert + response rows).
 
         Args:
@@ -254,7 +256,7 @@ class Record:
                 )
 
     @classmethod
-    def parse(cls, data: dict[str, Any]) -> "Record":
+    def parse(cls, data: dict[str, Any]) -> Record:
         """Build a :class:`Record` from its SQLite rows.
 
         ``data`` carries the main ``"deployments"`` row plus the
@@ -284,10 +286,10 @@ class Record:
     @classmethod
     def list(
         cls,
-        repo: "Repository",
+        repo: Repository,
         *,
         domain: str | None = None,
-    ) -> list["Record"]:
+    ) -> list[Record]:
         """All deployments, optionally filtered by ``domain``.
 
         Args:
@@ -493,7 +495,7 @@ class Bundler:
 
     @staticmethod
     def fsync_directory(directory: Path) -> None:
-        """fsync a directory to durably record file replacements.
+        """Fsync a directory to durably record file replacements.
 
         Best-effort: some platforms do not allow opening a directory
         fd for fsync. Failures are silently swallowed because the data
@@ -518,12 +520,8 @@ class Bundler:
     @staticmethod
     def rm_tmp(path: Path) -> None:
         """Best-effort removal of a temporary directory used for staging."""
-        import shutil
-
-        try:
+        with contextlib.suppress(OSError):
             shutil.rmtree(path, ignore_errors=True)
-        except OSError:
-            pass
 
 
 class Guard:
@@ -553,7 +551,7 @@ class Guard:
     """
 
     BLOCKED_NETWORKS: tuple[
-        "ipaddress.IPv4Network | ipaddress.IPv6Network", ...
+        ipaddress.IPv4Network | ipaddress.IPv6Network, ...
     ] = (
         ipaddress.ip_network("0.0.0.0/8"),
         ipaddress.ip_network("127.0.0.0/8"),
@@ -597,7 +595,7 @@ class Guard:
         self.allow_loopback = allow_loopback
         self.resolver = resolver
 
-    def check(self, url: str) -> "Pin":
+    def check(self, url: str) -> Pin:
         """Validate ``url`` and return the pinned connection target.
 
         Args:
@@ -640,7 +638,7 @@ class Guard:
                 f"deployment host {host} did not resolve to any address"
             )
         seen_families: set[int] = set()
-        last_rejection: "Deploy | None" = None
+        last_rejection: Deploy | None = None
         for info in infos:
             family = info[0]
             sock_address = info[4]
@@ -672,9 +670,9 @@ class Guard:
 
     def check_address(
         self,
-        parsed_address: "ipaddress.IPv4Address | ipaddress.IPv6Address",
-        host: str,
-    ) -> "Deploy | None":
+        parsed_address: ipaddress.IPv4Address | ipaddress.IPv6Address,
+        host: str,  # noqa: ARG002 - reserved for diagnostic messages / future override
+    ) -> Deploy | None:
         """Return a rejection error for blocked addresses or ``None``."""
         for network in self.BLOCKED_NETWORKS:
             if parsed_address in network:
@@ -738,10 +736,10 @@ class Transport(httpx.BaseTransport):
     :data:`HTTP_RESPONSE_READ_LIMIT`.
     """
 
-    pinned: "Pin"
+    pinned: Pin
     closed: bool
 
-    def __init__(self, pinned: "Pin") -> None:
+    def __init__(self, pinned: Pin) -> None:
         """Initialize the pinned transport.
 
         Args:
@@ -801,10 +799,8 @@ class Transport(httpx.BaseTransport):
             request.headers["Host"] = self.pinned.host
             return self.round_trip(request, sock, timeout)
         finally:
-            try:
+            with contextlib.suppress(OSError):
                 sock.close()
-            except OSError:
-                pass
 
     @staticmethod
     def read_timeout(request: httpx.Request) -> float:
@@ -929,7 +925,7 @@ class Client:
     max_retries: int
     retry_backoff: float
     follow_redirects: bool
-    ssrf_guard: "Guard"
+    ssrf_guard: Guard
 
     def __init__(
         self,
@@ -937,7 +933,7 @@ class Client:
         timeout: float = 30,
         allow_private_targets: bool = False,
         allow_loopback: bool = False,
-        ssrf_guard: "Guard | None" = None,
+        ssrf_guard: Guard | None = None,
         max_retries: int = 0,
         retry_backoff: float = 0.5,
         follow_redirects: bool = False,
@@ -990,9 +986,9 @@ class Client:
         manifest: Manifest,
         target: str,
         *,
-        record_id: "str | None" = None,
-        headers: "Mapping[str, str] | None" = None,
-        idempotency_key: "str | None" = None,
+        record_id: str | None = None,
+        headers: Mapping[str, str] | None = None,
+        idempotency_key: str | None = None,
     ) -> Record:
         """Push ``manifest`` to ``target`` (local path or http(s) URL).
 
@@ -1040,7 +1036,7 @@ class Client:
         manifest: Manifest,
         directory: Path,
         *,
-        record_id: "str | None" = None,
+        record_id: str | None = None,
     ) -> Record:
         """Write ``manifest`` to ``directory`` atomically.
 
@@ -1069,9 +1065,9 @@ class Client:
         manifest: Manifest,
         url: str,
         *,
-        record_id: "str | None" = None,
-        headers: "Mapping[str, str] | None" = None,
-        idempotency_key: "str | None" = None,
+        record_id: str | None = None,
+        headers: Mapping[str, str] | None = None,
+        idempotency_key: str | None = None,
     ) -> Record:
         """POST ``manifest`` to ``url`` and return the deployment record.
 
@@ -1121,7 +1117,7 @@ class Client:
         )
         attempt = 0
         backoff = self.retry_backoff
-        last_error: "Deploy | None" = None
+        last_error: Deploy | None = None
         while attempt <= self.max_retries:
             try:
                 with httpx.Client(
@@ -1231,14 +1227,14 @@ class Client:
 __all__ = [
     "DEPLOYMENT_KIND_HTTP",
     "DEPLOYMENT_KIND_LOCAL",
+    "HTTP_RESPONSE_BODY_LIMIT",
+    "HTTP_RESPONSE_READ_LIMIT",
+    "RESERVED_HEADERS",
     "Bundler",
     "Client",
     "Guard",
-    "HTTP_RESPONSE_BODY_LIMIT",
-    "HTTP_RESPONSE_READ_LIMIT",
     "Manifest",
     "Pin",
     "Record",
-    "RESERVED_HEADERS",
     "Transport",
 ]

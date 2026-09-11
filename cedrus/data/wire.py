@@ -26,12 +26,17 @@ See Also:
 
 from __future__ import annotations
 
+import base64
 import hashlib
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+from cedrus.error import Config
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from pathlib import Path
 
 
 class TargetKind(StrEnum):
@@ -80,8 +85,6 @@ class Headers:
                 name, contains CR/LF in either name or value, has a
                 reserved name, or exceeds the length cap.
         """
-        from ..error import Config
-
         reserved = {"host", "authorization", "cookie", "content-length", "transfer-encoding"}
         items: list[tuple[str, str]] = []
         for entry in raw:
@@ -150,8 +153,6 @@ class Body:
             A dict with ``content_type``, ``payload_b64`` and
             ``sha256`` keys.
         """
-        import base64
-
         return {
             "content_type": self.content_type,
             "payload_b64": base64.b64encode(self.payload).decode("ascii"),

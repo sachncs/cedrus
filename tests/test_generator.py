@@ -4,12 +4,15 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from cedrus import Action, Need, Principal, Resource
 from cedrus.generate import Context, Offline, Proposal, Result
-from cedrus.scope import Clause
+
+if TYPE_CHECKING:
+    from cedrus.scope import Scope
 
 
 def make_need() -> Need:
@@ -350,9 +353,8 @@ def test_llm_format_renders_resource_as_json_object() -> None:
 
 
 def test_llm_format_renders_intent_as_one_line_summary() -> None:
-    from cedrus.generate.litellm import Llm
-
     from cedrus import Intent
+    from cedrus.generate.litellm import Llm
 
     llm = Llm(model="openai/gpt-4", timeout=60)
     intent = Intent(
@@ -371,11 +373,10 @@ def test_llm_format_rejects_unsupported_type() -> None:
     from typing import cast
 
     from cedrus.generate.litellm import Llm
-    from cedrus.scope import Scope
 
     llm = Llm(model="openai/gpt-4", timeout=60)
     with pytest.raises(Exception):
-        llm.format(cast(Scope, "not a scope"))
+        llm.format(cast("Scope", "not a scope"))
 
 
 # ---------------------------------------------------------------------------
@@ -420,9 +421,8 @@ def test_llm_build_dict_with_effect_calls_intent_parse() -> None:
 
 def test_llm_build_dict_dispatches_action_to_action_class() -> None:
     """{'name': ...} dispatches to Action.from_dict, producing an Action with kind 'any' default."""
-    from cedrus.generate.litellm import Llm
-
     from cedrus import Action
+    from cedrus.generate.litellm import Llm
 
     llm = Llm(model="openai/gpt-4", timeout=60)
     scope = llm.build({"name": "view"})
@@ -432,9 +432,8 @@ def test_llm_build_dict_dispatches_action_to_action_class() -> None:
 
 def test_llm_build_dict_with_group_type_dispatches_to_principal() -> None:
     """Principal.from_dict routes by group_type key."""
-    from cedrus.generate.litellm import Llm
-
     from cedrus import Principal
+    from cedrus.generate.litellm import Llm
 
     llm = Llm(model="openai/gpt-4", timeout=60)
     principal = llm.build({"group_type": "Group", "group_id": "admins"})
@@ -443,9 +442,8 @@ def test_llm_build_dict_with_group_type_dispatches_to_principal() -> None:
 
 def test_llm_build_dict_with_parent_type_dispatches_to_resource() -> None:
     """Resource.from_dict routes by parent_type key."""
-    from cedrus.generate.litellm import Llm
-
     from cedrus import Resource
+    from cedrus.generate.litellm import Llm
 
     llm = Llm(model="openai/gpt-4", timeout=60)
     resource = llm.build({"parent_type": "Album", "parent_id": "v"})
@@ -494,7 +492,7 @@ def test_llm_extract_raises_on_missing_message_content() -> None:
     from cedrus.generate.litellm import Llm
 
     class StubResponse:
-        choices: list[Any] = []
+        choices: list[Any] = []  # noqa: RUF012 - local stub data
 
     llm = Llm(model="openai/gpt-4", timeout=60)
     with pytest.raises(Exception):
@@ -510,7 +508,7 @@ def test_llm_usage_extracts_int_counts() -> None:
     from cedrus.generate.litellm import Llm
 
     class StubResponse:
-        usage = {
+        usage = {  # noqa: RUF012 - local stub data
             "prompt_tokens": 10,
             "completion_tokens": 20,
             "total_tokens": 30,

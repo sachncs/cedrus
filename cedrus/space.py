@@ -41,6 +41,7 @@ Attributes:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import tempfile
@@ -51,8 +52,8 @@ from pathlib import Path
 from typing import Any, cast
 
 from cedrus.case import Case, Run, Suite
-from cedrus.data import Payload
 from cedrus.compile import Intent
+from cedrus.data import Payload
 from cedrus.deploy import Bundler, Client, Manifest, Record
 from cedrus.error import Fault, Require, Store
 from cedrus.error import Space as SpaceError
@@ -88,7 +89,7 @@ class Space:
     storage_path: Path
 
     @classmethod
-    def open(cls, path: Path) -> "Space":
+    def open(cls, path: Path) -> Space:
         """Open an existing workspace at ``path``.
 
         Args:
@@ -108,7 +109,7 @@ class Space:
         return cls(root=root, repository=repository, storage_path=storage_path)
 
     @classmethod
-    def create(cls, path: Path) -> "Space":
+    def create(cls, path: Path) -> Space:
         """Create a new workspace at ``path`` and return it.
 
         Args:
@@ -125,7 +126,7 @@ class Space:
         return cls(root=root, repository=repository, storage_path=storage_path)
 
     @classmethod
-    def in_memory(cls, path: Path | None = None) -> "Space":
+    def in_memory(cls, path: Path | None = None) -> Space:
         """Build an in-memory workspace for tests or ephemeral sessions.
 
         Args:
@@ -197,10 +198,8 @@ class Space:
                 os.replace(tmp_name, schema_path)
             except OSError:
                 os.close(fd)
-                try:
+                with contextlib.suppress(OSError):
                     os.unlink(tmp_name)
-                except OSError:
-                    pass
                 raise
         return schema_path
 
@@ -827,7 +826,7 @@ class Space:
         domain: str,
         schema: Schema,
         *,
-        entities: Sequence[Mapping[str, Any]] = (),
+        entities: Sequence[Mapping[str, Any]] = (),  # noqa: ARG002 - wired in #17
     ) -> Suite:
         """Run every scenario for ``domain`` against its compiled policies.
 
@@ -1081,11 +1080,11 @@ class Space:
         data = json.loads(payload)
         if not isinstance(data, dict):
             return None
-        return cast(dict[str, Any], data)
+        return cast("dict[str, Any]", data)
 
     @staticmethod
     def intent_from_draft(
-        draft: "DraftStored", intent_id: str, requirement_id: str
+        draft: DraftStored, intent_id: str, requirement_id: str
     ) -> Intent | None:
         """Rebuild the typed intent for a stored draft.
 
@@ -1161,9 +1160,8 @@ class Space:
 
 __all__ = [
     "DEFAULT_REQUIREMENTS_DIRNAME",
-    "DEFAULT_SCHEMA_FILENAME",
     "DEFAULT_SCENARIOS_FILENAME",
+    "DEFAULT_SCHEMA_FILENAME",
     "DEFAULT_STORAGE_FILENAME",
-    "Space",
     "Space",
 ]
