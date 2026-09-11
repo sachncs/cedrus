@@ -195,7 +195,7 @@ cedrus requirement add hr/requirements/HR-042.md --domain hr
 # Generate a draft policy deterministically (no LLM needed).
 cedrus policy generate HR-042 \
     --domain hr \
-    --principal specific --principal-type User --entity-id alice \
+    --principal specific --principal-type User --principal-id alice \
     --action named --action-name viewPhoto \
     --resource is_type --resource-type Photo \
     --offline
@@ -203,7 +203,7 @@ cedrus policy generate HR-042 \
 # Apply the draft (validates + persists + runs scenarios).
 cedrus policy apply HR-042 \
     --domain hr \
-    --principal specific --principal-type User --entity-id alice \
+    --principal specific --principal-type User --principal-id alice \
     --action named --action-name viewPhoto \
     --resource is_type --resource-type Photo \
     --no-scenarios

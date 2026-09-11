@@ -11,7 +11,7 @@ set -euo pipefail
 SCOPE_GENERATE=(
     --principal specific
     --principal-type User
-    --entity-id alice
+    --principal-id alice
     --action named
     --action-name viewPhoto
     --resource is_type
@@ -22,7 +22,7 @@ SCOPE_GENERATE=(
 SCOPE_APPLY=(
     --principal specific
     --principal-type User
-    --entity-id alice
+    --principal-id alice
     --action named
     --action-name viewPhoto
     --resource is_type

@@ -180,12 +180,21 @@ def add_scope_arguments(
         help="Resource scope kind.",
     )
     parser.add_argument("--principal-type", help="Principal entity type name.")
-    parser.add_argument("--entity-id", help="Entity id (for specific scope).")
+    parser.add_argument(
+        "--principal-id", help="Principal entity id (for specific principal)."
+    )
+    parser.add_argument(
+        "--entity-id",
+        help="Deprecated alias for --principal-id / --resource-id.",
+    )
     parser.add_argument("--group-type", help="Group type (for in_group principal).")
     parser.add_argument("--group-id", help="Group id (for in_group principal).")
     parser.add_argument("--action-name", help="Action name (for named action).")
     parser.add_argument("--action-group", help="Action group (for in_group action).")
     parser.add_argument("--resource-type", help="Resource entity type name.")
+    parser.add_argument(
+        "--resource-id", help="Resource entity id (for specific resource)."
+    )
     parser.add_argument("--parent-type", help="Parent type (for in_parent resource).")
     parser.add_argument("--parent-id", help="Parent id (for in_parent resource).")
 
@@ -887,16 +896,19 @@ def build_principal(args: Namespace) -> Principal:
 
     Args:
         args: Parsed CLI namespace; reads ``args.principal``,
-            ``args.principal_type``, ``args.entity_id``,
+            ``args.principal_type``, ``args.principal_id``,
             ``args.group_type``, ``args.group_id``.
 
     Returns:
         A :class:`~cedrus.scope.Principal` configured from the flags.
     """
+    principal_id = getattr(args, "principal_id", None) or getattr(
+        args, "entity_id", None
+    )
     return Principal(
         kind=args.principal,
         type_name=args.principal_type,
-        entity_id=args.entity_id,
+        entity_id=principal_id,
         group_type=args.group_type,
         group_id=args.group_id,
     )
@@ -924,16 +936,19 @@ def build_resource(args: Namespace) -> Resource:
 
     Args:
         args: Parsed CLI namespace; reads ``args.resource``,
-            ``args.resource_type``, ``args.entity_id``,
+            ``args.resource_type``, ``args.resource_id``,
             ``args.parent_type``, ``args.parent_id``.
 
     Returns:
         A :class:`~cedrus.scope.Resource` configured from the flags.
     """
+    resource_id = getattr(args, "resource_id", None) or getattr(
+        args, "entity_id", None
+    )
     return Resource(
         kind=args.resource,
         type_name=args.resource_type,
-        entity_id=args.entity_id,
+        entity_id=resource_id,
         parent_type=args.parent_type,
         parent_id=args.parent_id,
     )
