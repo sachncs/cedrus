@@ -74,11 +74,10 @@ suite grew from ~100 tests across ~10 modules to **561 tests
 across 21 modules, 91% line coverage**. The 0.4.0 / 0.5.0 / 0.6.0
 history is preserved below.
 
-The v0.8.0 release ships a multi-region replication backend
-(Postgres via the existing `Repository` interface), a CRDT
-settings layer for collaborative workspace editing, and a
-gRPC-over-UDS transport for the optional plugin runtime. The
-`docs/roadmap.md` carries the full schedule.
+The roadmap captures the direction (multi-region replication,
+collaborative editing, plugin runtime) but no version after 0.7.0
+has been cut yet. The TODO list in `todo.md` carries the
+historical rebuild plan and is kept for archaeology only.
 
 ---
 
@@ -514,11 +513,11 @@ Full documentation lives in **[docs/](docs/)**:
 
 ## Roadmap
 
-- **v0.8.0** — Multi-region replication (Postgres via the existing
-  `Repository` interface, no domain-package changes). CRDT settings
-  for collaborative workspace editing. gRPC-over-UDS transport for
-  the optional plugin runtime. See `docs/roadmap.md` for the
-  detailed schedule.
+- **v0.8.0** — Planned. Multi-region replication (Postgres via the
+  existing `Repository` interface, no domain-package changes).
+  CRDT settings for collaborative workspace editing. gRPC-over-UDS
+  transport for the optional plugin runtime. Detailed scheduling is
+  tracked in `todo.md`.
 - **v1.0.0** — Stable API. Final review of all public surfaces.
   No breaking changes after this point.
 
