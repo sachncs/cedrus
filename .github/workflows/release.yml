@@ -64,6 +64,11 @@ jobs:
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: "v2.4.1"
+      - name: Sign wheel
+        run: |
+          cosign sign-blob --yes \
+            --output-signature dist/cedrus-${GITHUB_REF_NAME#v}.whl.sig \
+            dist/cedrus-${GITHUB_REF_NAME#v}.whl
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -76,3 +81,5 @@ jobs:
             dist/*.tar.gz
             dist/sbom.cdx.json
             dist/*.sig
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
