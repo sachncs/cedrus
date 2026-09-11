@@ -359,7 +359,10 @@ class Backend:
         Returns:
             A list of row dicts (empty when the query returns no rows).
         """
-        return [dict(row) for row in self.connection.execute(query, params).fetchall()]
+        with self.lock:
+            return [
+                dict(row) for row in self.connection.execute(query, params).fetchall()
+            ]
 
     def execute(
         self,
@@ -377,7 +380,8 @@ class Backend:
             query: SQL ``INSERT`` / ``UPDATE`` / ``DELETE`` statement.
             params: Named (dict) or positional (tuple) placeholders.
         """
-        self.connection.execute(query, params)
+        with self.lock:
+            self.connection.execute(query, params)
 
     def remove_requirement(self, requirement_id: str) -> None:
         """Remove the requirement with ``requirement_id``.
@@ -425,7 +429,7 @@ class Backend:
 
         @contextlib.contextmanager
         def _cm() -> Any:
-            with self.connection:
+            with self.lock, self.connection:
                 yield None
 
         return _cm()
