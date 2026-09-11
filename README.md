@@ -548,7 +548,10 @@ Security Advisories workflow — **do not open a public issue.**
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/sachncs/cedrus/issues)
+  for bug reports and feature requests.
 - **Discussions**: [GitHub Discussions](https://github.com/sachncs/cedrus/discussions)
+  is the supported surface for usage questions and ideas. Discussions
+  are enabled on this repository.
 
 ## License
 
