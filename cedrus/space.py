@@ -709,11 +709,12 @@ class Space:
 
         The validation report, scenario test report, and compiled
         policy upsert all happen inside a single repository
-        transaction. If scenarios fail the raise happens before the
-        transaction commits, so the validation report, test report,
-        and policy upsert are all rolled back together. A failed
-        apply therefore never leaves the workspace in a half-applied
-        state.
+        transaction. The same transaction is used to persist the
+        reports when a scenario fails, so operators can inspect the
+        failed scenario outcomes even though the policy itself is
+        rolled back. A failed apply therefore never leaves the
+        workspace in a half-applied state but does preserve the
+        failure diagnostics for later inspection.
 
         Args:
             draft: Draft to apply.
@@ -737,21 +738,12 @@ class Space:
                 f"draft {draft.id} has unresolved items: {', '.join(draft.unresolved)}"
             )
         report = Vreport.from_cedar([draft.cedar], schema)
+        test_report: Suite | None = None
         if scenarios:
             scenario_list: list[Case] = list(scenarios)
             test_report = draft.test(
                 schema, scenario_list, entities=self.resolve_test_entities(entities)
             )
-            if not test_report.passed:
-                failures = [
-                    result
-                    for result in test_report.results
-                    if not result.passed
-                ]
-                raise SpaceError(
-                    f"draft {draft.id} failed scenarios: "
-                    + ", ".join(failure.scenario.name for failure in failures)
-                )
         with self.repository.transaction():
             self.build_stored_report(draft.id, "validation", report).save(
                 self.repository
@@ -764,6 +756,16 @@ class Space:
                 )
                 self.build_stored_report(draft.id, "test", test_report_vreport).save(
                     self.repository
+                )
+            if scenarios and test_report is not None and not test_report.passed:
+                failures = [
+                    result
+                    for result in test_report.results
+                    if not result.passed
+                ]
+                raise SpaceError(
+                    f"draft {draft.id} failed scenarios: "
+                    + ", ".join(failure.scenario.name for failure in failures)
                 )
             compiled = Compiled(
                 id=draft.id,
