@@ -7,18 +7,22 @@ provided for the latest minor release and the previous minor release.
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 0.7.x   | :white_check_mark: |
 | 0.6.x   | :white_check_mark: |
-| 0.5.x   | :white_check_mark: |
-| < 0.5   | :x:                |
+| < 0.6   | :x:                |
 
 ## Reporting a vulnerability
 
 **Please do not report security vulnerabilities through public GitHub
 issues, discussions, or pull requests.**
 
-Send a private report to the maintainers via
-[sachncs@gmail.com](mailto:sachncs@gmail.com). Include the following
-information:
+Use the GitHub Security Advisories workflow for this repository when
+possible — it keeps the report private and routes it directly to the
+maintainers with a tracked disclosure timeline. A fallback private
+email channel is also accepted at
+[sachncs@gmail.com](mailto:sachncs@gmail.com).
+
+When reporting, include the following information:
 
 - A description of the vulnerability and its impact.
 - A minimal reproduction, including the policy or schema involved.
