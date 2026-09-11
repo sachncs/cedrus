@@ -4,7 +4,7 @@
   <p align="center">
     <a href="#installation"><img src="https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python" alt="Python"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
-    <a href="https://github.com/sachncs/cedrus/actions"><img src="https://img.shields.io/github/actions/workflow/status/sachncs/cedrus/ci.yaml?branch=master" alt="CI"></a>
+    <a href="https://github.com/sachncs/cedrus/actions"><img src="https://img.shields.io/github/actions/workflow/status/sachncs/cedrus/ci.yml?branch=main" alt="CI"></a>
     <a href="https://github.com/sachncs/cedrus/stargazers"><img src="https://img.shields.io/github/stars/sachncs/cedrus" alt="Stars"></a>
   </p>
 </p>
