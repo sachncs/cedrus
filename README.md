@@ -511,7 +511,15 @@ Until then, install from a clone with
 
 ## Documentation
 
-Full documentation lives in **[docs/](docs/)**:
+The published documentation site is published from this repository
+via GitHub Pages at
+[`<repository-owner>.github.io/<project>`](https://sachncs.github.io/cedrus/).
+The Pages build is configured to source from the repository root
+(legacy build, `main` branch) and is the canonical hosted entry
+point. The repository's homepage URL points at this surface, and
+the rendered site mirrors the docs/ tree below.
+
+The full source documentation lives under **[docs/](docs/)**:
 
 - [Architecture overview](docs/architecture.md) — the requirement-to-deployment pipeline, module responsibility table, persistence schema, and extension points
 - [Python API reference](docs/python-api.md) — workspace, drafts, generators, compilation, validation, scenarios, verification, deployment
