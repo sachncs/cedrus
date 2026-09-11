@@ -439,7 +439,10 @@ class DraftStored:
         Args:
             repo: Storage backend to write through.
             intent: Replacement :class:`Intent`, or ``None`` to leave
-                the existing value in place.
+                the existing value in place. When supplied, the
+                replacement scopes are inserted into the typed
+                sub-tables so the FK targets exist before the draft
+                row is updated.
             principal: Replacement :class:`Principal`, or ``None`` to
                 leave the existing value in place.
             action: Replacement :class:`Action`, or ``None`` to leave
@@ -458,37 +461,49 @@ class DraftStored:
             assignments.append("resource_id = :resource_id")
         if not assignments:
             return
+        # When the intent is being replaced, derive the scope objects
+        # we'll insert from the replacement intent itself rather than
+        # from ``self`` so the FK targets stay consistent with the
+        # new intent graph.
+        intent_principal = principal if principal is not None else (
+            intent.principal if intent is not None else None
+        )
+        intent_action = action if action is not None else (
+            intent.action if intent is not None else None
+        )
+        intent_resource = resource if resource is not None else (
+            intent.resource if intent is not None else None
+        )
         params: dict[str, Any] = {"id": self.id}
         # Insert new scope rows so the FK targets exist before we
         # update the drafts row.
         with repo.transaction():
-            if principal is not None:
+            if intent_principal is not None:
                 repo.execute(
                     "INSERT OR REPLACE INTO principals "
                     "(id, kind, type_name, entity_id, group_type, group_id) "
                     "VALUES (:id, :kind, :type_name, :entity_id, :group_type, :group_id)",
-                    principal.to_data(),
+                    intent_principal.to_data(),
                 )
-                params["principal_id"] = principal.id
-            if action is not None:
+                params["principal_id"] = intent_principal.id
+            if intent_action is not None:
                 repo.execute(
                     "INSERT OR REPLACE INTO actions "
                     "(id, kind, name, action_group, namespace) "
                     "VALUES (:id, :kind, :name, :action_group, :namespace)",
-                    action.to_data(),
+                    intent_action.to_data(),
                 )
-                params["action_id"] = action.id
-            if resource is not None:
+                params["action_id"] = intent_action.id
+            if intent_resource is not None:
                 repo.execute(
                     "INSERT OR REPLACE INTO resources "
                     "(id, kind, type_name, entity_id, parent_type, parent_id) "
                     "VALUES (:id, :kind, :type_name, :entity_id, :parent_type, :parent_id)",
-                    resource.to_data(),
+                    intent_resource.to_data(),
                 )
-                params["resource_id"] = resource.id
+                params["resource_id"] = intent_resource.id
             if intent is not None:
-                rows = self.to_rows()
-                write_intent(repo, rows)
+                write_intent(repo, intent.to_data())
                 params["intent_id"] = intent.id
             repo.execute(
                 f"UPDATE drafts SET {', '.join(assignments)} WHERE id = :id",
