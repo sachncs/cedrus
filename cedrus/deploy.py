@@ -839,8 +839,11 @@ class Transport(httpx.BaseTransport):
         """
         body = b"" if request.content is None else bytes(request.content)
         host_header = request.headers.get("Host") or request.url.host or ""
+        target_path = request.url.path or "/"
+        query = request.url.query.decode("ascii") if request.url.query else ""
+        request_uri = f"{target_path}?{query}" if query else target_path
         head_lines = [
-            f"{request.method} {request.url.path or '/'} HTTP/1.1",
+            f"{request.method} {request_uri} HTTP/1.1",
             f"Host: {host_header}",
         ]
         for name, value in request.headers.items():
