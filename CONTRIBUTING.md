@@ -112,9 +112,9 @@ checklist expands to include the listed concerns.
 
 | File | Review checklist |
 |------|-------------------|
-| `cedrus/deployment.py` | DNS pinning closes SSRF rebind window; no body bytes in errors; redirects disabled by default; idempotency key recorded; retries bounded; symlink targets refused; atomic writes use fsync. |
-| `cedrus/verification.py` | Structured AST parser (cedarpy) replaces regex; malformed policies emit `malformed-policy` finding; condition signatures normalized via canonical JSON. |
-| `cedrus/generator/litellm.py` | User content fenced in `<<<...>>>` delimiters; system prompt explicitly forbids instructions inside markers. |
-| `cedrus/workspace.py` | `intent_from_draft` returns None or raises Space on corrupt stored JSON; never synthesizes a permissive `permit(any/any/any)` fallback. `find_action_namespace` raises on ambiguous action names. |
-| `cedrus/storage/sqlite.py` | `column_exists` validates table against allow-list; transactions wrap multi-statement writes; `check_same_thread=False` paired with RLock; WAL + busy_timeout PRAGMAs. |
+| `cedrus/deploy.py` | DNS pinning closes SSRF rebind window; no body bytes in errors; redirects disabled by default; idempotency key recorded; retries bounded; symlink targets refused; atomic writes use fsync; IPv4-mapped loopback and other reserved ranges blocked. |
+| `cedrus/verify.py` | Structured AST parser (cedarpy) replaces regex; malformed policies emit `malformed-policy` finding; condition signatures normalized via canonical JSON. |
+| `cedrus/generate/litellm.py` | User content fenced in `<<<...>>>` delimiters; fence delimiters escaped in user content; system prompt explicitly forbids instructions inside markers. |
+| `cedrus/space.py` | `intent_from_draft` returns None or raises Space on corrupt stored JSON; never synthesizes a permissive `permit(any/any/any)` fallback. `find_action_namespace` raises on ambiguous action names. Domain identifiers validated against path-traversal. |
+| `cedrus/store/sqlite.py` | `column_exists` validates table against allow-list; transactions wrap multi-statement writes; `check_same_thread=False` paired with RLock; WAL + busy_timeout PRAGMAs. |
 | `cedrus/cli.py` | Top-level catch wraps non-Error exceptions in JSON envelope; `parse_headers` rejects CR/LF and reserved names; `validate_identifier` rejects path-traversal-shaped inputs. |
