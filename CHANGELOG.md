@@ -286,3 +286,10 @@ are static.
 [0.6.0]: https://github.com/sachncs/cedrus/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/sachncs/cedrus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/sachncs/cedrus/releases/tag/v0.4.0
+
+> **Status note.** The changelog entries above are reconstructed
+> from the source-level rewrite history; no corresponding GitHub
+> Release, git tag, or PyPI publication has been cut for any of
+> these versions yet. Use [`release.yml`](.github/workflows/release.yml)
+> as the production release contract — see the README "Release"
+> section for the current state.

@@ -463,21 +463,29 @@ single `cedrus` package with one console script (`cedrus`).
 
 ## Release
 
-Tagged `vX.Y.Z` releases are produced by GitHub Actions. Each
-release:
+The release workflow (`.github/workflows/release.yml`) is the
+documented contract for a future tagged release. As of the current
+revision, **no GitHub Release or PyPI publication has been cut**:
+the package is at 0.7.0 in source, but the public surfaces are not
+yet wired to that tag. The changelog lists the historical roadmap
+(0.4.0 → 0.7.0) for context; no tarball, wheel, SBOM, or signature
+artifact is currently published.
 
-- Runs the full test matrix on Python 3.11 and 3.12 with a 90%
-  coverage gate.
-- Builds an sdist and a wheel via `python -m build`.
-- Publishes to PyPI via `pypa/gh-action-pypi-publish`.
-- Generates a SBOM (CycloneDX) and signs the release with `sigstore
-  cosign` (keyless; the bundle ships next to the wheel).
-- Creates a GitHub Release with auto-generated notes from the
+When a tagged release is eventually produced, each release will:
+
+- Run the full test matrix on Python 3.11, 3.12 and 3.13 with a
+  90% coverage gate.
+- Build an sdist and a wheel via `python -m build`.
+- Publish to PyPI via `pypa/gh-action-pypi-publish`.
+- Generate a SBOM (CycloneDX) and sign the wheel with sigstore
+  cosign (keyless; the `.sig` bundle ships next to the wheel).
+- Create a GitHub Release with auto-generated notes from the
   commit log.
 
-See [CHANGELOG.md](CHANGELOG.md) for the full release history.
-The 0.7.0 entry is the first release after the full data-model
-rewrite.
+Until then, install from a clone with
+`pip install -e ".[test]"` and treat the package as
+"reproducible-from-source, not yet distributed". See
+[CHANGELOG.md](CHANGELOG.md) for the historical changelog.
 
 ---
 
