@@ -398,6 +398,10 @@ class Bundler:
                 fails, or the directory is a symlink or a symlink exists
                 inside the staging directory.
         """
+        if directory.is_symlink():
+            raise Deploy(
+                f"refusing to write deployment bundle through symlink: {directory}"
+            )
         directory = directory.resolve(strict=False)
         if directory.is_symlink():
             raise Deploy(
