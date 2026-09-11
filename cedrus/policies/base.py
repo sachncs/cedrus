@@ -156,19 +156,22 @@ class Kind(ABC):
         self,
         schema: Schema,
         scenarios: Sequence[Case],
-        entities: list[Mapping[str, object]] | None = None,  # noqa: ARG002 - wired in #17
+        entities: Sequence[Mapping[str, object]] = (),
     ) -> Suite:
         """Run authorization scenarios through the Cedar engine.
 
         Args:
             schema: Cedar schema for scenario evaluation.
             scenarios: Scenarios to execute against this policy's Cedar.
-            entities: Optional entities to expose to the engine.
+            entities: Optional sequence of entity dicts exposed to the
+                Cedar engine when evaluating each scenario.
 
         Returns:
             A :class:`Suite` summarizing the results.
         """
-        evaluated = Run(scenarios).evaluate(schema, [self.cedar])
+        evaluated = Run(scenarios).evaluate(
+            schema, [self.cedar], entities=list(entities),
+        )
         return evaluated if evaluated is not None else Suite(
             passed=True, results=()
         )

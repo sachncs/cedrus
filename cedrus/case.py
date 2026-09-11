@@ -201,6 +201,7 @@ class Run:
         self,
         schema: Schema,
         policies: Sequence[str],
+        entities: Sequence[Mapping[str, Any]] = (),
     ) -> Suite:
         """Run every :attr:`cases` against ``policies`` and ``schema``.
 
@@ -208,6 +209,10 @@ class Run:
             schema: The Cedar schema to use for evaluation.
             policies: Cedar source for every compiled policy under
                 test.
+            entities: Optional sequence of entity dicts exposed to
+                the Cedar engine when evaluating each scenario.
+                Empty by default; callers that have prepared an
+                entity graph should pass it through.
 
         Returns:
             The populated :class:`Suite`. Also stored on
@@ -216,7 +221,7 @@ class Run:
         """
         policy_set = PolicySet.from_str("\n\n".join(policies))
         outcomes = tuple(
-            self.evaluate_one(schema, scenario, policy_set)
+            self.evaluate_one(schema, scenario, policy_set, entities=entities)
             for scenario in self.cases
         )
         suite = Suite(
@@ -231,6 +236,7 @@ class Run:
         schema: Schema,
         scenario: Case,
         policy_set: Any,
+        entities: Sequence[Mapping[str, Any]] = (),
     ) -> Outcome:
         """Evaluate a single :class:`Case` against ``policy_set``.
 
@@ -242,6 +248,9 @@ class Run:
             scenario: The scenario to evaluate.
             policy_set: An already-built :class:`cedarpy.PolicySet`
                 (or any backend-specific equivalent).
+            entities: Sequence of entity dicts exposed to the Cedar
+                engine during evaluation. Empty by default; callers
+                that have prepared an entity graph should pass it.
 
         Returns:
             The :class:`Outcome` for ``scenario``.
@@ -257,7 +266,7 @@ class Run:
             "context": scenario.context,
         }
         auth_result = is_authorized(
-            request, policy_set, [], schema=schema.handle
+            request, policy_set, [dict(e) for e in entities], schema=schema.handle
         )
         actual_str = auth_result.decision.name
         if actual_str == "Allow":
