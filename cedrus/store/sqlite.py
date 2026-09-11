@@ -297,24 +297,55 @@ class Backend:
         self.migrate()
 
     def migrate(self) -> None:
-        """Create the schema and stamp the current version in one transaction.
+        """Create the schema and reconcile it with the declared version.
 
-        Idempotent: every ``CREATE`` uses ``IF NOT EXISTS`` so the
-        statement is safe to re-run on a database that's already at
-        the current version. The schema version is set inside the same
-        transaction as the schema objects, so a partially-created
-        database either has its declared version or does not exist
-        at all.
+        The flow on every :meth:`__post_init__` is:
+
+        1. Read the recorded ``meta.schema_version`` (if any).
+        2. If ``meta`` is absent or empty, run the full ``CREATE``
+           set and stamp the current version. This is the only path
+           that mutates the database; the operations are all
+           idempotent (``CREATE ... IF NOT EXISTS``) so they are
+           safe on an existing current-version database too.
+        3. If a recorded version is older than :data:`SCHEMA_VERSION`,
+           refuse the open. SQLite has no ``ALTER TABLE ALTER
+           COLUMN``-equivalent for every column change and we have
+           no data to preserve, so an older database is treated as
+           incompatible and :class:`~cedrus.error.Store` is raised
+           rather than silently partial migration. Operators opening
+           an older file should re-create the workspace.
+        4. If the recorded version equals the current version, the
+           schema is already in place and no writes happen.
         """
-        with self.transaction():
-            for statement in SCHEMA_STATEMENTS:
-                self.connection.execute(statement)
-            self.stamp_schema_version()
+        with self.lock:
+            try:
+                existing = self.connection.execute(
+                    "SELECT schema_version FROM meta"
+                ).fetchone()
+            except sqlite3.OperationalError:
+                existing = None
+        if existing is None:
+            with self.lock, self.connection:
+                for statement in SCHEMA_STATEMENTS:
+                    self.connection.execute(statement)
+                self.connection.execute(
+                    "INSERT INTO meta (schema_version) VALUES (?)",
+                    (SCHEMA_VERSION,),
+                )
+            return
+        recorded = existing["schema_version"]
+        if recorded != SCHEMA_VERSION:
+            raise Store(
+                f"cedrus schema version {recorded} is incompatible with "
+                f"this build (expected {SCHEMA_VERSION}); re-create the "
+                "workspace with `cedrus init` instead of opening this file"
+            )
 
     def stamp_schema_version(self) -> None:
         """Insert or update the ``meta.schema_version`` row in this transaction.
 
-        Must be called inside a :meth:`transaction` block.
+        Retained for backward-compatible callers; :meth:`migrate`
+        no longer relies on it for everyday opens.
         """
         row = self.connection.execute("SELECT schema_version FROM meta").fetchone()
         if row is None:
