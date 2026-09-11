@@ -7,7 +7,8 @@ the test suite against `cedrus/`. Run locally with:
 .venv/bin/python -m pytest tests/ --cov=cedrus --cov-report=term
 ```
 
-The test suite lives under `tests/` and contains 500+ tests across:
+The test suite lives under `tests/` and contains 564 tests across
+20 modules:
 
 - `test_cli.py` / `test_cli_ergonomics.py` — argparse and helper
   paths.
@@ -18,6 +19,7 @@ The test suite lives under `tests/` and contains 500+ tests across:
 - `test_generator.py` — `Offline` heuristic and `Llm` helpers.
 - `test_policies.py` — `Draft` / `Compiled` / `Existing` data
   modelling and `apply` / `compile` paths.
+- `test_requirements.py` — `Need` Markdown loader.
 - `test_scenarios.py` — `Case` / `Run` / `Suite`.
 - `test_schema.py` — `Schema` parsing and namespace lookups.
 - `test_scopes.py` — `Principal` / `Action` / `Resource` / `Clause`
@@ -36,41 +38,41 @@ The test suite lives under `tests/` and contains 500+ tests across:
 
 ## Current coverage (run `pytest --cov=cedrus --cov-report=term-missing`)
 
-| Module                                | Statements | Missed | Coverage |
-| ------------------------------------- | ----------: | -----: | -------: |
-| `cedrus/__init__.py`            |          19 |      0 |    100 % |
-| `cedrus/__main__.py`             |           2 |      0 |    100 % |
-| `cedrus/case.py`                 |          74 |      7 |     91 % |
-| `cedrus/cli.py`                  |         356 |     35 |     90 % |
-| `cedrus/compile.py`              |         116 |      2 |     98 % |
-| `cedrus/data/__init__.py`        |           4 |      0 |    100 % |
-| `cedrus/data/transit.py`        |          30 |      0 |    100 % |
-| `cedrus/data/unresolved.py`     |          19 |      1 |     95 % |
-| `cedrus/data/wire.py`            |         114 |      7 |     94 % |
-| `cedrus/deploy.py`               |         405 |     59 |     85 % |
-| `cedrus/domain.py`               |          67 |      5 |     93 % |
-| `cedrus/error.py`               |          18 |      0 |    100 % |
-| `cedrus/generate/__init__.py`    |           4 |      0 |    100 % |
-| `cedrus/generate/base.py`        |          15 |      0 |    100 % |
-| `cedrus/generate/litellm.py`     |         111 |     13 |     88 % |
-| `cedrus/generate/offline.py`     |          32 |      2 |     94 % |
-| `cedrus/need.py`                 |         100 |      2 |     98 % |
-| `cedrus/policies/__init__.py`   |           5 |      0 |    100 % |
-| `cedrus/policies/base.py`       |          37 |      2 |     95 % |
-| `cedrus/policies/compiled.py`    |          31 |      1 |     97 % |
-| `cedrus/policies/draft.py`       |          63 |      0 |    100 % |
-| `cedrus/policies/existing.py`    |          25 |      0 |    100 % |
-| `cedrus/schema.py`              |         112 |     11 |     90 % |
-| `cedrus/scope.py`                |         180 |      4 |     98 % |
-| `cedrus/space.py`                |         306 |     51 |     83 % |
-| `cedrus/store/__init__.py`      |           4 |      0 |    100 % |
-| `cedrus/store/base.py`          |         227 |     23 |     90 % |
-| `cedrus/store/memory.py`        |          17 |      0 |    100 % |
-| `cedrus/store/sqlite.py`        |          62 |      5 |     92 % |
-| `cedrus/utils.py`                |           9 |      0 |    100 % |
-| `cedrus/validate.py`            |          43 |      8 |     81 % |
-| `cedrus/verify.py`              |         330 |     44 |     87 % |
-| **TOTAL**                              |     **2937** | **277** | **91 %** |
+| Module                              | Statements | Missed | Coverage |
+| ----------------------------------- | ----------: | -----: | -------: |
+| `cedrus/__init__.py`                |          19 |      0 |    100 % |
+| `cedrus/__main__.py`                |           3 |      0 |    100 % |
+| `cedrus/case.py`                    |          74 |      7 |     91 % |
+| `cedrus/cli.py`                     |         356 |     35 |     90 % |
+| `cedrus/compile.py`                 |         123 |      3 |     98 % |
+| `cedrus/data/__init__.py`           |           4 |      0 |    100 % |
+| `cedrus/data/transit.py`            |          30 |      0 |    100 % |
+| `cedrus/data/unresolved.py`         |          19 |      1 |     95 % |
+| `cedrus/data/wire.py`               |         114 |      7 |     94 % |
+| `cedrus/deploy.py`                  |         415 |     56 |     87 % |
+| `cedrus/domain.py`                  |          67 |      5 |     93 % |
+| `cedrus/error.py`                   |          18 |      0 |    100 % |
+| `cedrus/generate/__init__.py`       |           4 |      0 |    100 % |
+| `cedrus/generate/base.py`           |          15 |      0 |    100 % |
+| `cedrus/generate/litellm.py`        |         114 |      9 |     92 % |
+| `cedrus/generate/offline.py`        |          32 |      2 |     94 % |
+| `cedrus/need.py`                    |         101 |      2 |     98 % |
+| `cedrus/policies/__init__.py`       |           5 |      0 |    100 % |
+| `cedrus/policies/base.py`           |          37 |      2 |     95 % |
+| `cedrus/policies/compiled.py`       |          31 |      1 |     97 % |
+| `cedrus/policies/draft.py`          |          63 |      0 |    100 % |
+| `cedrus/policies/existing.py`       |          25 |      0 |    100 % |
+| `cedrus/schema.py`                  |         112 |     11 |     90 % |
+| `cedrus/scope.py`                   |         186 |      6 |     97 % |
+| `cedrus/space.py`                   |         307 |     46 |     85 % |
+| `cedrus/store/__init__.py`          |           4 |      0 |    100 % |
+| `cedrus/store/base.py`              |         229 |     24 |     90 % |
+| `cedrus/store/memory.py`            |          17 |      0 |    100 % |
+| `cedrus/store/sqlite.py`            |          62 |      5 |     92 % |
+| `cedrus/utils.py`                   |           9 |      0 |    100 % |
+| `cedrus/validate.py`                |          43 |      8 |     81 % |
+| `cedrus/verify.py`                  |         330 |     44 |     87 % |
+| **TOTAL**                           |     **2968** | **274** | **91 %** |
 
 ## Areas intentionally not covered
 

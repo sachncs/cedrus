@@ -440,8 +440,8 @@ cedrus/
 .venv/bin/python -m pytest --cov=cedrus --cov-report=term-missing
 ```
 
-The test suite has 561 tests across 21 modules. Coverage is
-**91%** (277 / 2937 stmts uncovered). The remaining gaps are mostly
+The test suite has 564 tests across 20 modules. Coverage is
+**91%** (274 / 2968 stmts uncovered). The remaining gaps are mostly
 defensive error paths in `deploy.py` (HTTP transport edge cases),
 the verifier AST helper edge cases, and `space.apply` failure
 paths. See [docs/coverage.md](docs/coverage.md) for the per-module

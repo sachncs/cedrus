@@ -23,23 +23,24 @@ verify, deploy, and CLI subsystems each picked up bug fixes uncovered
 by the new test suite.
 
 ### Tests
-The test suite grew from ~100 tests covering ~10 modules to **561
-tests across 21 modules**, raising coverage from 0% to 91% line
+The test suite grew from ~100 tests covering ~10 modules to **564
+tests across 20 modules**, raising coverage from 0% to 91% line
 coverage on `cedrus/`.
 
 | Test file                             | Tests  | Coverage scope                                               |
 | ------------------------------------- | -----: | ------------------------------------------------------------ |
-| `tests/test_cli.py`                   |    45  | `main` exit codes, argparse type helpers, every subcommand handler |
-| `tests/test_cli_ergonomics.py`         |    15  | `validate_identifier`, `parse_headers`, identifier safety     |
+| `tests/test_cli.py`                   |    44  | `main` exit codes, argparse type helpers, every subcommand handler |
+| `tests/test_cli_ergonomics.py`         |    17  | `validate_identifier`, `parse_headers`, identifier safety     |
 | `tests/test_compiler.py`              |    32  | `Intent` constructor validation, `compile` determinism, JSON round-trip |
 | `tests/test_deployment.py`            |    54  | `Bundler` / `Client` / `Record` / `Guard` end-to-end, edge cases |
-| `tests/test_deployment_pinned.py`     |    11  | DNS-pinned HTTP transport, SSRF guard                        |
-| `tests/test_domain.py`                |     5  | `Domain` data container                                      |
+| `tests/test_deployment_pinned.py`     |     7  | DNS-pinned HTTP transport, SSRF guard                        |
+| `tests/test_domain.py`                |    20  | `Domain` data container                                      |
 | `tests/test_generator.py`            |    39  | `Offline` heuristic, `Llm` helpers (Prompt / format / build / extract / usage) |
 | `tests/test_policies.py`              |    41  | `Draft` / `Compiled` / `Existing` data modelling and behaviour  |
+| `tests/test_requirements.py`          |    28  | `Need` Markdown loader                                       |
 | `tests/test_scenarios.py`             |    14  | `Case` / `Run` / `Suite` data modelling                       |
 | `tests/test_schema.py`                |    34  | `Schema` parsing, namespace lookups, ignore-filters          |
-| `tests/test_scopes.py`                |    41  | `Principal` / `Action` / `Resource` / `Clause` rendering, `Scope.parse` |
+| `tests/test_scopes.py`                |    42  | `Principal` / `Action` / `Resource` / `Clause` rendering, `Scope.parse` |
 | `tests/test_ssrf_guard.py`            |    22  | `Guard` blocked-network rules                                 |
 | `tests/test_storage.py`               |    45  | `Memory` / `Backend` typed-object CRUD, FK orphan handling    |
 | `tests/test_utils.py`                 |     4  | `utils.id` generator                                          |
