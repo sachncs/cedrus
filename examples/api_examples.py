@@ -12,12 +12,10 @@ file top to bottom.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from cedrus import (
     Action,
     Case,
-    Compiled,
     Draft,
     Intent,
     Llm,
@@ -26,12 +24,11 @@ from cedrus import (
     Principal,
     Report,
     Resource,
+    Run,
     Schema,
     Space,
-    compile,
-    run,
-    validate,
-    verify,
+    Validator,
+    Verifier,
 )
 
 PHOTOFLASH_SCHEMA = {
@@ -92,7 +89,7 @@ def recipe_compile() -> None:
         action=Action(kind="named", name="viewPhoto", namespace="PhotoFlash"),
         resource=Resource(kind="is_type", type_name="PhotoFlash::Photo"),
     )
-    source = compile(intent)
+    source = intent.compile()
     print("compile ->", source.cedar.replace("\n", " "))
 
 
@@ -103,11 +100,11 @@ def recipe_validate() -> None:
         'action == PhotoFlash::Action::"viewPhoto", '
         'resource is PhotoFlash::Photo);'
     )
-    report = validate([cedar], make_schema())
+    report = Validator(make_schema()).validate([cedar])
     print("validate ->", report.passed, report.formatted)
 
 
-def recipe_offline_generator(workspace: Space) -> tuple[Draft, Any]:
+def recipe_offline_generator() -> Draft:
     """Run the deterministic Offline on a draft policy."""
     schema = make_schema()
     draft = Draft(
@@ -122,7 +119,7 @@ def recipe_offline_generator(workspace: Space) -> tuple[Draft, Any]:
     )
     proposal = draft.generate(schema, Offline())
     print("offline_generator ->", proposal.intent.effect, proposal.unresolved)
-    return draft, proposal
+    return draft
 
 
 def recipe_litellm_generator_factory() -> Llm:
@@ -136,7 +133,7 @@ def recipe_litellm_generator_factory() -> Llm:
     )
 
 
-def recipe_run(workspace: Space, compiled: Compiled) -> None:
+def recipe_run(cedar: str) -> None:
     """Run a small scenario suite against the compiled policy."""
     schema = make_schema()
     scenarios = [
@@ -157,21 +154,19 @@ def recipe_run(workspace: Space, compiled: Compiled) -> None:
             expected="Deny",
         ),
     ]
-    report = run([compiled.cedar], entities=[], scenarios=scenarios, schema=schema)
+    report = Run(scenarios).evaluate(schema, [cedar])
     print("run ->", report.passed, [(r.scenario.name, r.actual) for r in report.results])
 
 
-def recipe_verify(workspace: Space) -> Report:
-    """Run static verification on a domain's compiled policies."""
+def recipe_verify(policies: list, requirement_ids: list) -> Report:
+    """Run static verification on the compiled policies."""
     schema = make_schema()
-    policies = workspace.list_compiled_policies("hr")
-    requirement_ids = [r.id for r in workspace.list_requirements("hr")]
-    report = verify(
-        domain="hr",
-        policies=policies,
+    report = Verifier(schema).verify(
+        policies,
         requirement_ids=requirement_ids,
         action_names=sorted(schema.action_names()),
         entity_type_names=sorted(schema.entity_type_names()),
+        domain="hr",
     )
     print(
         "verify ->",
@@ -207,15 +202,23 @@ def main() -> None:
     print("== validate ==")
     recipe_validate()
     print("== offline_generator ==")
-    recipe_offline_generator(workspace)
+    draft = recipe_offline_generator()
     print("== litellm_generator_factory ==")
     generator = recipe_litellm_generator_factory()
     print("litellm_generator ->", generator.model, generator.fallbacks)
+    print("== run ==")
+    cedar = (
+        'permit (principal is PhotoFlash::User, '
+        'action == PhotoFlash::Action::"viewPhoto", '
+        'resource is PhotoFlash::Photo);'
+    )
+    recipe_run(cedar)
     print("== verify ==")
-    recipe_verify(workspace)
+    recipe_verify([], ["HR-042"])
     print("== deployment ==")
     recipe_deployment(workspace)
 
 
 if __name__ == "__main__":
     main()
+
