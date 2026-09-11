@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# End-to-end PhotoFlash workflow driven through the cedar-intent CLI.
+# End-to-end PhotoFlash workflow driven through the cedrus CLI.
 #
 # Usage: bash scripts/run.sh
 #
@@ -29,25 +29,25 @@ SCOPE_APPLY=(
     --resource-type Photo
 )
 
-cedar-intent --workspace . requirement add hr/requirements/HR-001.md --domain hr
-cedar-intent --workspace . requirement add hr/requirements/HR-042.md --domain hr
+cedrus --workspace . requirement add hr/requirements/HR-001.md --domain hr
+cedrus --workspace . requirement add hr/requirements/HR-042.md --domain hr
 
-cedar-intent --workspace . policy generate HR-042 \
+cedrus --workspace . policy generate HR-042 \
     --domain hr "${SCOPE_GENERATE[@]}"
 
-cedar-intent --workspace . policy apply HR-042 \
+cedrus --workspace . policy apply HR-042 \
     --domain hr "${SCOPE_APPLY[@]}" \
     --no-scenarios
 
-cedar-intent --workspace . policy generate HR-001 \
+cedrus --workspace . policy generate HR-001 \
     --domain hr "${SCOPE_GENERATE[@]}"
 
-cedar-intent --workspace . policy apply HR-001 \
+cedrus --workspace . policy apply HR-001 \
     --domain hr "${SCOPE_APPLY[@]}" \
     --no-scenarios
 
-cedar-intent --workspace . --json check
-cedar-intent --workspace . --json verify --domain hr
-cedar-intent --workspace . deploy bundle --domain hr --output ./dist/hr
+cedrus --workspace . --json check
+cedrus --workspace . --json verify --domain hr
+cedrus --workspace . deploy bundle --domain hr --output ./dist/hr
 
 echo "Workspace ready. Bundle written to dist/hr."

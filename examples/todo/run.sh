@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# End-to-end Todo workflow driven through the cedar-intent CLI.
+# End-to-end Todo workflow driven through the cedrus CLI.
 #
 # Usage: bash run.sh
 
@@ -24,25 +24,25 @@ SCOPE_APPLY_OWNER=(
     --resource-type Task
 )
 
-cedar-intent --workspace . requirement add tasks/requirements/TSK-001.md --domain tasks
-cedar-intent --workspace . requirement add tasks/requirements/TSK-002.md --domain tasks
+cedrus --workspace . requirement add tasks/requirements/TSK-001.md --domain tasks
+cedrus --workspace . requirement add tasks/requirements/TSK-002.md --domain tasks
 
-cedar-intent --workspace . policy generate TSK-001 \
+cedrus --workspace . policy generate TSK-001 \
     --domain tasks "${SCOPE_GENERATE[@]}"
 
-cedar-intent --workspace . policy apply TSK-001 \
+cedrus --workspace . policy apply TSK-001 \
     --domain tasks "${SCOPE_GENERATE[@]}" \
     --no-scenarios
 
-cedar-intent --workspace . policy generate TSK-002 \
+cedrus --workspace . policy generate TSK-002 \
     --domain tasks "${SCOPE_APPLY_OWNER[@]}"
 
-cedar-intent --workspace . policy apply TSK-002 \
+cedrus --workspace . policy apply TSK-002 \
     --domain tasks "${SCOPE_APPLY_OWNER[@]}" \
     --no-scenarios
 
-cedar-intent --workspace . --json check
-cedar-intent --workspace . --json verify --domain tasks
-cedar-intent --workspace . deploy bundle --domain tasks --output ./dist/tasks
+cedrus --workspace . --json check
+cedrus --workspace . --json verify --domain tasks
+cedrus --workspace . deploy bundle --domain tasks --output ./dist/tasks
 
 echo "Workspace ready. Bundle written to dist/tasks."
