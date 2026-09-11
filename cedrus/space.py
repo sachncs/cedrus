@@ -73,6 +73,38 @@ DEFAULT_SCHEMA_FILENAME = "schema.json"
 DEFAULT_SCENARIOS_FILENAME = "scenarios.json"
 
 
+def validate_domain_identifier(domain: str) -> str:
+    """Validate that ``domain`` is a safe filesystem identifier.
+
+    Domain identifiers are interpolated into workspace paths by the
+    :class:`Space` API. Anything outside a conservative alphabet is
+    rejected to prevent path traversal or NUL injection through the
+    Python API surface (the CLI shares the same rule, enforced by
+    :func:`cedrus.cli.validate_identifier`).
+
+    Args:
+        domain: Identifier supplied by the user.
+
+    Returns:
+        The validated identifier (unchanged).
+
+    Raises:
+        Space: When ``domain`` is empty, too long, or contains
+            characters outside ``[A-Za-z0-9._-]``.
+    """
+    if not domain or not domain.strip():
+        raise SpaceError("domain must be non-empty")
+    if len(domain) > 64:
+        raise SpaceError("domain must be at most 64 characters")
+    for ch in domain:
+        if not (ch.isalnum() or ch in "._-"):
+            raise SpaceError(
+                f"domain {domain!r} contains illegal character {ch!r}; "
+                "use only letters, digits, '.', '_', and '-'"
+            )
+    return domain
+
+
 @dataclass
 class Space:
     """Top-level cedrus orchestrator for a single organization workspace.
@@ -150,18 +182,22 @@ class Space:
         Returns:
             Path under ``<workspace>/<domain>/requirements/``.
         """
+        validate_domain_identifier(domain)
         return self.root / domain / DEFAULT_REQUIREMENTS_DIRNAME
 
     def schema_path(self, domain: str) -> Path:
         """Return the path of the schema file for ``domain``."""
+        validate_domain_identifier(domain)
         return self.root / domain / DEFAULT_SCHEMA_FILENAME
 
     def scenarios_path(self, domain: str) -> Path:
         """Return the path of the scenarios file for ``domain``."""
+        validate_domain_identifier(domain)
         return self.root / domain / DEFAULT_SCENARIOS_FILENAME
 
     def policies_directory(self, domain: str) -> Path:
         """Return the directory holding imported Cedar policy files for ``domain``."""
+        validate_domain_identifier(domain)
         return self.root / domain / "policies"
 
     def init_domain(self, domain: str) -> Path:
@@ -180,6 +216,7 @@ class Space:
         Returns:
             The path of the schema file after initialization.
         """
+        validate_domain_identifier(domain)
         self.requirements_directory(domain).mkdir(parents=True, exist_ok=True)
         self.policies_directory(domain).mkdir(parents=True, exist_ok=True)
         schema_path = self.schema_path(domain)
