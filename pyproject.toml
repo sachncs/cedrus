@@ -40,11 +40,11 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sachin/cedrus"
-Source = "https://github.com/sachin/cedrus"
-Issues = "https://github.com/sachin/cedrus/issues"
-Changelog = "https://github.com/sachin/cedrus/blob/main/CHANGELOG.md"
-Security = "https://github.com/sachin/cedrus/blob/main/SECURITY.md"
+Homepage = "https://github.com/sachncs/cedrus"
+Source = "https://github.com/sachncs/cedrus"
+Issues = "https://github.com/sachncs/cedrus/issues"
+Changelog = "https://github.com/sachncs/cedrus/blob/main/CHANGELOG.md"
+Security = "https://github.com/sachncs/cedrus/blob/main/SECURITY.md"
 
 [project.scripts]
 cedrus = "cedrus.cli:main"

@@ -27,7 +27,7 @@ of opening a public issue.
 ## Development setup
 
 ```bash
-git clone https://github.com/sachin/cedrus.git
+git clone https://github.com/sachncs/cedrus.git
 cd cedrus
 python -m venv .venv
 source .venv/bin/activate
