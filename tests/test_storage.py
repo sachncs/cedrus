@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
+from sqlite3 import IntegrityError
 
 import pytest
-from sqlite3 import IntegrityError
 
 from cedrus import (
     Action,

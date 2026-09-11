@@ -22,8 +22,6 @@ Attributes:
 
 from __future__ import annotations
 
-import builtins
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -32,7 +30,10 @@ from typing import TYPE_CHECKING, Any
 from cedrus.error import Require
 
 if TYPE_CHECKING:
-    from cedrus.store import Backend, Repository
+    import builtins
+    from collections.abc import Mapping
+
+    from cedrus.store import Repository
 
 
 @dataclass(frozen=True, slots=True)
@@ -145,7 +146,7 @@ class Need:
         repo: Repository,
         *,
         domain: str | None = None,
-    ) -> "builtins.list[Need]":
+    ) -> builtins.list[Need]:
         """Load all requirements, optionally filtered by ``domain``.
 
         Args:
@@ -170,7 +171,7 @@ class Need:
         cls,
         path: Path,
         workspace_root: Path | None = None,
-    ) -> "Need":
+    ) -> Need:
         """Load a single requirement from a Markdown file.
 
         Args:
@@ -209,7 +210,7 @@ class Need:
         cls,
         directory: Path,
         workspace_root: Path | None = None,
-    ) -> "builtins.list[Need]":
+    ) -> builtins.list[Need]:
         """Load every ``*.md`` requirement in ``directory`` non-recursively.
 
         Args:

@@ -27,16 +27,19 @@ See Also:
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from cedrus.compile import Intent
 from cedrus.error import Fault
-from cedrus.need import Need
-from cedrus.schema import Schema
-from cedrus.validate import Validator, Vreport
 from cedrus.policies.base import Kind
+from cedrus.validate import Validator, Vreport
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from cedrus.compile import Intent
+    from cedrus.need import Need
+    from cedrus.schema import Schema
 
 
 @dataclass(frozen=True, slots=True)

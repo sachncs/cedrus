@@ -272,7 +272,7 @@ def test_verify_reports_missing_entity_type() -> None:
         domain="hr",
     )
     # Album is in the policies' principal/resource scope but not in schema
-    # (the policy's principal doesn't reference Album, only its resource does; 
+    # (the policy's principal doesn't reference Album, only its resource does;
     # we use the schema's actual entities here to confirm entity coverage).
     # The test simply verifies the report is produced.
     assert isinstance(report, Report)
@@ -449,7 +449,7 @@ def test_verifier_extract_returns_extraction_for_valid_cedar() -> None:
     schema = build_schema()
 
     class GoodPolicy:
-        cedar = 'permit (principal, action, resource);'
+        cedar = "permit (principal, action, resource);"
         id = "ok"
 
     extraction = Verifier(schema).extract(GoodPolicy())

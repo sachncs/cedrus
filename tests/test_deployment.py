@@ -9,17 +9,17 @@ import httpx
 import pytest
 
 from cedrus.deploy import (
-    Bundler,
-    Client,
     DEPLOYMENT_KIND_HTTP,
     DEPLOYMENT_KIND_LOCAL,
-    Guard,
     HTTP_RESPONSE_BODY_LIMIT,
     HTTP_RESPONSE_READ_LIMIT,
+    RESERVED_HEADERS,
+    Bundler,
+    Client,
+    Guard,
     Manifest,
     Pin,
     Record,
-    RESERVED_HEADERS,
     Transport,
 )
 
@@ -78,10 +78,10 @@ def test_bundler_build_rejects_empty_policies() -> None:
 
 
 def test_bundler_build_skips_policies_without_cedar() -> None:
-    from cedrus import Compiled, Draft
     from datetime import UTC, datetime
     from pathlib import Path
 
+    from cedrus import Compiled
     from cedrus.need import Need
 
     need = Need(
@@ -137,14 +137,12 @@ def test_bundler_read_directory_round_trips(tmp_path: Path) -> None:
 
 
 def test_bundler_read_directory_raises_for_missing(tmp_path: Path) -> None:
-    from cedrus.error import Deploy as DeployError
 
     with pytest.raises(Exception):
         Bundler().read_directory(tmp_path / "ghost")
 
 
 def test_bundler_read_directory_raises_on_hash_mismatch(tmp_path: Path) -> None:
-    from cedrus.error import Deploy as DeployError
 
     target = tmp_path / "out"
     target.mkdir()
@@ -294,7 +292,7 @@ def test_client_local_deploy_uses_supplied_record_id(tmp_path: Path) -> None:
 
 def test_client_local_deploy_creates_parent_directories(tmp_path: Path) -> None:
     client = Client(timeout=30)
-    record = client.deploy_local(build_test_manifest(), tmp_path / "deep" / "out")
+    client.deploy_local(build_test_manifest(), tmp_path / "deep" / "out")
     assert (tmp_path / "deep" / "out" / "bundle.cedar").exists()
 
 
@@ -456,28 +454,24 @@ def test_deployment_kind_constants() -> None:
 
 
 def test_transport_read_timeout_defaults_when_extension_missing() -> None:
-    from cedrus.deploy import Transport
 
-    request = cast(httpx.Request, type("R", (), {"extensions": {}})())
+    request = cast("httpx.Request", type("R", (), {"extensions": {}})())
     assert Transport.read_timeout(request) == 30.0
 
 
 def test_transport_read_timeout_extracts_httpx_timeout_connect() -> None:
-    from cedrus.deploy import Transport
 
-    request = cast(httpx.Request, type("R", (), {"extensions": {"timeout": httpx.Timeout(5.0)}})())
+    request = cast("httpx.Request", type("R", (), {"extensions": {"timeout": httpx.Timeout(5.0)}})())
     assert Transport.read_timeout(request) == 5.0
 
 
 def test_transport_read_timeout_extracts_mapping_value() -> None:
-    from cedrus.deploy import Transport
 
-    request = cast(httpx.Request, type("R", (), {"extensions": {"timeout": {"connect": 7.5}}})())
+    request = cast("httpx.Request", type("R", (), {"extensions": {"timeout": {"connect": 7.5}}})())
     assert Transport.read_timeout(request) == 7.5
 
 
 def test_transport_read_timeout_raises_on_invalid_mapping() -> None:
-    from cedrus.deploy import Transport
     from cedrus.error import Deploy as DeployError
 
     request = type("R", (), {"extensions": {"timeout": {"connect": "not a number"}}})()
@@ -486,7 +480,6 @@ def test_transport_read_timeout_raises_on_invalid_mapping() -> None:
 
 
 def test_transport_read_timeout_defaults_for_timeout_with_no_connect() -> None:
-    from cedrus.deploy import Transport
 
     timeout = httpx.Timeout(connect=2.0, read=2.0, write=2.0, pool=2.0)
     request = type("R", (), {"extensions": {"timeout": timeout}})()

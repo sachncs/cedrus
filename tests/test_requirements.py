@@ -16,7 +16,6 @@ from cedrus.need import (
     slugify,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -62,7 +61,7 @@ def test_parse_front_matter_returns_empty_dict_when_no_marker() -> None:
 
 
 def test_parse_front_matter_returns_empty_when_marker_unclosed() -> None:
-    fm, body = parse_front_matter("---\nid: x\nno closing marker\n")
+    fm, _body = parse_front_matter("---\nid: x\nno closing marker\n")
     assert fm == {}
 
 
@@ -244,9 +243,8 @@ def test_from_directory_skips_non_md_files() -> None:
 
 
 def test_from_directory_raises_for_missing_directory() -> None:
-    with tempfile.TemporaryDirectory() as tmp:
-        with pytest.raises(Require):
-            Need.from_directory(Path(tmp) / "nope")
+    with tempfile.TemporaryDirectory() as tmp, pytest.raises(Require):
+        Need.from_directory(Path(tmp) / "nope")
 
 
 __all__ = []

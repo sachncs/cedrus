@@ -60,13 +60,16 @@ See Also:
 
 from __future__ import annotations
 
+import contextlib
 import sqlite3
 import threading
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from cedrus.error import Store
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 #: Current schema version. Bump whenever the SQLite schema changes in
 #: a way that requires row data to be migrated.
@@ -329,10 +332,8 @@ class Backend:
         Idempotent: subsequent calls are no-ops because the underlying
         :class:`sqlite3.Connection.close` is itself idempotent.
         """
-        try:
+        with contextlib.suppress(sqlite3.ProgrammingError):
             self.connection.close()
-        except sqlite3.ProgrammingError:
-            pass
 
     def fetch(
         self,

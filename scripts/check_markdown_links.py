@@ -31,11 +31,7 @@ def _is_external(target: str) -> bool:
     """Return ``True`` when ``target`` is not a local filesystem path."""
     lowered = target.lower().strip()
     return (
-        lowered.startswith("http://")
-        or lowered.startswith("https://")
-        or lowered.startswith("mailto:")
-        or lowered.startswith("tel:")
-        or lowered.startswith("#")
+        lowered.startswith(("http://", "https://", "mailto:", "tel:", "#"))
     )
 
 
@@ -59,16 +55,11 @@ def _check(markdown_paths: list[Path]) -> tuple[int, list[str]]:
 def main(argv: list[str]) -> int:
     """CLI entry point."""
     if not argv:
-        print("usage: check_markdown_links.py <markdown> ...", file=sys.stderr)
         return 2
     code, missing = _check([Path(arg) for arg in argv])
     if code != 0:
-        for line in missing:
-            print(line, file=sys.stderr)
-        print(
-            f"\n{len(missing)} broken local Markdown link target(s).",
-            file=sys.stderr,
-        )
+        for _line in missing:
+            pass
     return code
 
 

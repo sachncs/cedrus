@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """Tests for the pinned HTTP transport.
 
 These tests cover:
@@ -15,6 +13,7 @@ These tests cover:
   max_retries; a 500 is not retried.
 """
 
+from __future__ import annotations
 
 import hashlib
 import socket
@@ -48,7 +47,7 @@ def stop_server(server: HTTPServer) -> None:
 def make_manifest() -> Manifest:
     return Manifest(
         domain="hr",
-        cedar='permit (principal, action, resource);',
+        cedar="permit (principal, action, resource);",
         bundle_hash=hashlib.sha256(b"permit (principal, action, resource);").hexdigest(),
         policy_ids=("HR-001",),
         created_at=datetime.now(UTC),
@@ -69,12 +68,12 @@ def patched_created_at(manifest: Manifest) -> Manifest:
 
 def test_pinned_transport_rejects_redirect_by_default() -> None:
     class Redirect(BaseHTTPRequestHandler):
-        def do_POST(self) -> None:  # noqa: N802
+        def do_POST(self) -> None:
             self.send_response(302)
             self.send_header("Location", "http://10.0.0.1/evil")
             self.end_headers()
 
-        def log_message(self, *_args: Any) -> None:  # noqa: D401
+        def log_message(self, *_args: Any) -> None:
             return
 
     server, port = start_server(Redirect)
@@ -96,14 +95,14 @@ def test_pinned_transport_pins_resolved_ip() -> None:
     captured_ip: list[str] = []
 
     class Capture(BaseHTTPRequestHandler):
-        def do_POST(self) -> None:  # noqa: N802
+        def do_POST(self) -> None:
             captured_ip.append(self.client_address[0])
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
             self.wfile.write(b"ok")
 
-        def log_message(self, *_args: Any) -> None:  # noqa: D401
+        def log_message(self, *_args: Any) -> None:
             return
 
     server, port = start_server(Capture)
@@ -122,7 +121,7 @@ def test_response_body_is_bounded() -> None:
     from cedrus.deploy import HTTP_RESPONSE_READ_LIMIT
 
     class Flood(BaseHTTPRequestHandler):
-        def do_POST(self) -> None:  # noqa: N802
+        def do_POST(self) -> None:
             self.send_response(200)
             self.send_header("Content-Type", "application/octet-stream")
             self.end_headers()
@@ -133,7 +132,7 @@ def test_response_body_is_bounded() -> None:
                 except (BrokenPipeError, ConnectionResetError):
                     return
 
-        def log_message(self, *_args: Any) -> None:  # noqa: D401
+        def log_message(self, *_args: Any) -> None:
             return
 
     server, port = start_server(Flood)
@@ -153,13 +152,13 @@ def test_response_body_is_bounded() -> None:
 
 def test_idempotency_key_recorded_in_response() -> None:
     class Ok(BaseHTTPRequestHandler):
-        def do_POST(self) -> None:  # noqa: N802
+        def do_POST(self) -> None:
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
             self.wfile.write(b"thanks")
 
-        def log_message(self, *_args: Any) -> None:  # noqa: D401
+        def log_message(self, *_args: Any) -> None:
             return
 
     server, port = start_server(Ok)
@@ -177,14 +176,14 @@ def test_500_response_is_not_retried() -> None:
     attempts: list[int] = []
 
     class Boom(BaseHTTPRequestHandler):
-        def do_POST(self) -> None:  # noqa: N802
+        def do_POST(self) -> None:
             attempts.append(1)
             self.send_response(500)
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
             self.wfile.write(b"server is sad")
 
-        def log_message(self, *_args: Any) -> None:  # noqa: D401
+        def log_message(self, *_args: Any) -> None:
             return
 
     server, port = start_server(Boom)

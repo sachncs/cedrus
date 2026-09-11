@@ -17,13 +17,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from cedrus.compile import Intent
 from cedrus.data.unresolved import Unresolved
 from cedrus.data.wire import Notes, Usage
-from cedrus.schema import Schema
-from cedrus.scope import Action, Principal, Resource
+
+if TYPE_CHECKING:
+    from cedrus.compile import Intent
+    from cedrus.schema import Schema
+    from cedrus.scope import Action, Principal, Resource
 
 
 @dataclass(frozen=True, slots=True)

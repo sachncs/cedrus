@@ -20,7 +20,6 @@ from cedrus.scope import (
 )
 from cedrus.utils import id as generate_id
 
-
 # ---------------------------------------------------------------------------
 # Data modelling
 # ---------------------------------------------------------------------------
@@ -57,8 +56,8 @@ def test_resource_default_is_any() -> None:
 
 
 def test_clause_requires_non_empty_body() -> None:
-    c = Clause(body="principal == User::\"alice\"")
-    assert c.body == "principal == User::\"alice\""
+    c = Clause(body='principal == User::"alice"')
+    assert c.body == 'principal == User::"alice"'
     assert c.attributes == {}
 
 
@@ -177,7 +176,7 @@ def test_scope_parse_raises_on_non_dict() -> None:
     from typing import cast
 
     with pytest.raises(Compile):
-        Scope.parse(cast(dict, "not a dict"))
+        Scope.parse(cast("dict", "not a dict"))
 
 
 def test_scope_parse_raises_on_invalid_scope() -> None:
@@ -211,7 +210,7 @@ def test_resource_to_dict_round_trip_preserves_fields() -> None:
 
 
 def test_clause_normalize_string_becomes_single_element_tuple() -> None:
-    clauses = Clause.normalize("principal == User::\"alice\"")
+    clauses = Clause.normalize('principal == User::"alice"')
     assert len(clauses) == 1
     assert clauses[0].body == 'principal == User::"alice"'
 

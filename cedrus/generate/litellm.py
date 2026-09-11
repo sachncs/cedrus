@@ -51,9 +51,8 @@ See Also:
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import litellm
 from openai import APIError
@@ -63,6 +62,9 @@ from cedrus.data import Notes, Unresolved, Usage
 from cedrus.error import Compile, Generate
 from cedrus.generate.base import Context, Proposal, Result
 from cedrus.scope import Action, Clause, Principal, Resource, Scope
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
 
 SYSTEM_PROMPT = """<role>
 You are an authorization engineer producing a typed Cedar policy from a single requirement.
@@ -574,4 +576,4 @@ class Llm:
         )
 
 
-__all__ = ["Llm", "SYSTEM_PROMPT"]
+__all__ = ["SYSTEM_PROMPT", "Llm"]

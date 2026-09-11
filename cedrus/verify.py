@@ -70,11 +70,12 @@ from __future__ import annotations
 import json
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import cedarpy
 
-from cedrus.schema import Schema
+if TYPE_CHECKING:
+    from cedrus.schema import Schema
 
 VerificationSeverity = str  # "warning" | "info"
 
@@ -215,7 +216,7 @@ class Extraction:
         schema_actions_by_namespace: Mapping[
             str, Mapping[str, tuple[str, ...]]
         ],
-    ) -> "Extraction":
+    ) -> Extraction:
         """Extract an :class:`Extraction` from one policy via cedarpy.
 
         Args:
@@ -762,7 +763,7 @@ def parse_principal_node(node: Mapping[str, Any]) -> tuple[str, ...]:
 
 def parse_action_node(
     node: Mapping[str, Any],
-    actions_by_namespace: Mapping[str, Mapping[str, tuple[str, ...]]],
+    actions_by_namespace: Mapping[str, Mapping[str, tuple[str, ...]]] | None = None,  # noqa: ARG001
 ) -> tuple[str, ...]:
     """Convert a cedarpy action node into a signature tuple.
 
@@ -773,7 +774,9 @@ def parse_action_node(
 
     Args:
         node: cedarpy action node.
-        actions_by_namespace: Action-group membership mapping.
+        actions_by_namespace: Action-group membership mapping kept for
+            parity with the principal / resource parsers; the
+            namespace lookup happens in the caller.
 
     Returns:
         The action signature tuple.
@@ -987,9 +990,7 @@ def extract_type_names(token: Any) -> list[str]:
         if not token or token in {"any", ""}:
             return []
         if (
-            token in {"==", "in", "named", "in_group"}
-            or token.endswith(" ==")
-            or token.endswith(" in")
+            token in {"==", "in", "named", "in_group"} or token.endswith((" ==", " in"))
         ):
             return []
         if token.startswith('"') and token.endswith('"'):

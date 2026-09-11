@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -15,6 +15,9 @@ from cedrus import (
     Need,
 )
 from cedrus.schema import Schema
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 PHOTOFLASH_SCHEMA = {
     "PhotoFlash": {

@@ -101,7 +101,7 @@ class Scope(ABC):
         """Reconstruct a scope from its JSON-friendly representation."""
 
     @classmethod
-    def parse(cls, data: Any) -> "Scope":
+    def parse(cls, data: Any) -> Scope:
         """Parse JSON-like data into the right :class:`Scope` subclass.
 
         Polymorphic entry point that dispatches on the discriminator
@@ -158,11 +158,11 @@ class Scope(ABC):
         except ScopeFault as error:
             raise Compile(f"scope payload is invalid: {error}") from error
         raise Compile(
-            f"scope payload missing discriminator; "
+            "scope payload missing discriminator; "
             "need one of parent_type / parent_id / group_type / group_id / name"
         )
         raise Compile(
-            f"scope payload missing discriminator; "
+            "scope payload missing discriminator; "
             "need one of parent_type / parent_id / group_type / group_id / name"
         )
         return None

@@ -24,13 +24,17 @@ Attributes:
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from cedarpy import format_policies, validate_policies
 
 from cedrus.error import Validate
-from cedrus.schema import Schema
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from cedrus.schema import Schema
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,7 +70,7 @@ class Vreport:
         cls,
         policies: Sequence[str],
         schema: Schema,
-    ) -> "Vreport":
+    ) -> Vreport:
         """Validate Cedar statements against ``schema`` and return a structured report.
 
         The canonical two-step pipeline: every ``policies`` entry is

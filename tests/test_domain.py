@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -21,6 +21,9 @@ from cedrus.data import (
     Usage,
 )
 from cedrus.error import Space
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_domain_create_classmethod(tmp_path: Path) -> None:

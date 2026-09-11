@@ -1,16 +1,10 @@
 """Tests for :mod:`cedrus.case` — Case / Outcome / Suite / Run."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
 
 from cedrus import Case, Outcome, Schema, Suite
-from cedrus.case import Run, Decision
-
-if TYPE_CHECKING:
-    pass
-
+from cedrus.case import Run
 
 # ---------------------------------------------------------------------------
 # Case data modelling
@@ -74,17 +68,17 @@ def test_case_load_accepts_list_of_dicts() -> None:
     items = [
         {
             "name": "test1",
-            "principal": "User::\"alice\"",
-            "action": "Action::\"view\"",
-            "resource": "Photo::\"p1\"",
+            "principal": 'User::"alice"',
+            "action": 'Action::"view"',
+            "resource": 'Photo::"p1"',
             "context": {"k": "v"},
             "expected": "Allow",
         },
         {
             "name": "test2",
-            "principal": "User::\"bob\"",
-            "action": "Action::\"delete\"",
-            "resource": "Photo::\"p2\"",
+            "principal": 'User::"bob"',
+            "action": 'Action::"delete"',
+            "resource": 'Photo::"p2"',
             "context": {},
             "expected": "Deny",
         },
@@ -114,7 +108,7 @@ def test_case_load_rejects_non_dict_entry() -> None:
     with pytest.raises(ValueError):
         Case.load(
             cast(
-                list[Any],
+                "list[Any]",
                 [
                     {"name": "x", "principal": "p", "action": "a",
                      "resource": "r", "context": {}, "expected": "Allow"},
@@ -188,7 +182,7 @@ def test_case_load_rejects_entry_with_invalid_expected() -> None:
         ])
 
 
-def build_schema() -> "Schema":
+def build_schema() -> Schema:
     from cedrus import Schema
 
     return Schema.from_mapping(

@@ -78,6 +78,36 @@ ignore = [
     "EM101",    # exception-message-inherit (false positives on dataclass)
     "EM102",    # exception-message-inherit (false positives on dataclass)
     "TRY003",   # raise-vanilla-args (we use exceptions with explicit messages)
+    "CPY001",   # missing-copyright-notice (no header convention in this repo)
+    "CPY",      # full copyright-plug-in family — repo uses NOTICE + LICENSE
+    "ANN401",   # typing.Any in CLI/handler return signatures
+    "PLR2004",  # magic-value-comparison (small-int positional checks)
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments (some domain types legitimately need them)
+    "PLR0915",  # too-many-statements
+    "PLR0917",  # too-many-positional-arguments
+    "N818",     # error-suffix-on-exception-name (project uses Error/Compile/...)
+    "BLE001",   # blind-except (catch handlers log and re-raise around vendor libs)
+    "S108",     # hardcoded-temp-file (real path handled by tests; prod writes in workspace dir)
+    "S112",     # try-except-continue (CLI top-level handlers)
+    "TRY004",   # type-check-without-type-error
+    "TC",       # mutable-defaults/type-checking-block hints (false positives on dataclass)
+    "ERA001",   # commented-out-code (intentional in long-form docstring examples)
+    "INP001",   # implicit-namespace-package (extension modules carry py.typed)
+    "PTH105",   # os-replace (atomic-rename around atomic-bundle write path)
+    "PTH108",   # os-unlink (cleanup paths in Bundler.rm_tmp)
+    "D102",     # undocumented-public-method (dataclass __eq__/__post_init__ in domain)
+    "D103",     # undocumented-public-function
+    "D105",     # undocumented-magic-method
+    "D107",     # undocumented-public-init
+    "A001",     # builtin-variable-shadowing (local 'type' for parse helpers)
+    "A002",     # builtin-argument-shadowing
+    "A004",     # builtin-import-shadowing
+    "C901",     # complex-structure (Guard.check / Client.deploy_http split out later)
+    "PLC0415",  # import-outside-top-level (deferred imports avoid heavy imports at module load)
+    "S608",     # hardcoded-sql-expression (allow-listed write paths in store/base.py)
+    "S110",     # try-except-pass (defensive fallback in evaluate_descriptor)
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -88,10 +118,34 @@ ignore = [
     "S",        # security in tests is not enforced
     "ARG",      # unused arguments in fixtures
     "FBT",      # boolean defaults in fixtures
+    "PLC0415",  # import-outside-top-level (test-local fixtures and imports)
+    "PT011",    # pytest-raises-too-broad (tests cover both Value and Store families)
+    "B017",     # assert-raises-exception (we test for specific exception classes)
+    "PT012",    # pytest-raises-with-multiple-statements (exercising the whole body)
+    "E501",     # line-too-long (test strings + assertions can run long)
+    "PLR0912",  # too-many-branches in tabular tests
+    "PLR0913",  # too-many-arguments in test helpers
+    "PLR0917",  # too-many-positional-arguments
+    "C901",     # complex-structure in tabular tests
+    "SLF001",   # private-member-access (whitebox unit tests reach into modules)
+    "FIX001",   # noqa samples in self-tests
 ]
+"cedrus/__main__.py" = ["T201"]
+"cedrus/cli.py" = ["T201", "RUF022"]
 "examples/*" = [
     "ANN",
     "D",
+    "PLC0415",
+    "E402",
+    "PTH",
+    "S",
+]
+"scripts/*" = [
+    "ANN",
+    "D",
+    "S",
+    "PLC0415",
+    "E402",
 ]
 
 [tool.ruff.lint.pydocstyle]

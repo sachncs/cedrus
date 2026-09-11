@@ -69,7 +69,7 @@ def test_vreport_from_cedar_raises_typeerror_on_non_string_input() -> None:
 
     schema = build_schema()
     with pytest.raises(Validate):
-        Vreport.from_cedar(cast(list, [42]), schema)
+        Vreport.from_cedar(cast("list", [42]), schema)
 
 
 def test_vreport_to_dict_carries_passed_and_formatted() -> None:
@@ -114,7 +114,7 @@ def test_vreport_from_cedar_wraps_typeerror() -> None:
     """Non-string policy input raises Validate via the TypeError branch."""
     schema = build_schema()
     with pytest.raises(Validate) as exc:
-        Vreport.from_cedar(cast(list, [42]), schema)
+        Vreport.from_cedar(cast("list", [42]), schema)
     assert "not a string" in str(exc.value.errors)
 
 

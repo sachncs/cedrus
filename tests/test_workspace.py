@@ -10,28 +10,24 @@ import pytest
 
 from cedrus import (
     Action,
-    Bundler,
-    Client,
     Compiled,
     Draft,
     Existing,
     Generator,
     Intent,
     Manifest,
-    Memory,
     Need,
     Principal,
-    Record,
     Resource,
     Schema,
     Space,
     Vreport,
 )
 from cedrus.space import (
-    DEFAULT_STORAGE_FILENAME,
     DEFAULT_REQUIREMENTS_DIRNAME,
-    DEFAULT_SCHEMA_FILENAME,
     DEFAULT_SCENARIOS_FILENAME,
+    DEFAULT_SCHEMA_FILENAME,
+    DEFAULT_STORAGE_FILENAME,
 )
 
 
@@ -335,7 +331,7 @@ def test_space_build_bundle_returns_manifest(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -362,7 +358,7 @@ def test_space_write_bundle_writes_directory(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -392,7 +388,7 @@ def test_space_export_domain_writes_concatenated_cedar(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -436,7 +432,7 @@ def test_space_validate_policies_returns_vreport(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -552,7 +548,7 @@ def test_space_list_existing_policies_returns_compiled_policies(tmp_path: Path) 
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "existing",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -578,7 +574,7 @@ def test_space_list_compiled_policies_returns_compiled(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -608,7 +604,7 @@ def test_space_list_compiled_policies_skips_orphans(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -696,7 +692,7 @@ def test_space_generate_draft_persists_stored_draft(tmp_path: Path) -> None:
             resource=Resource(kind="is_type", type_name="Photo"),
         )
         schema = ws.load_schema("hr")
-        new_draft, result = ws.generate_draft(draft, schema, cast(Generator, Offline()))
+        new_draft, _result = ws.generate_draft(draft, schema, cast("Generator", Offline()))
         assert new_draft.intent is not None
         from cedrus.store import DraftStored
 
@@ -761,7 +757,6 @@ def test_space_test_domain_raises_when_no_scenarios(tmp_path: Path) -> None:
 
 def test_space_test_domain_raises_when_no_compiled_policies(tmp_path: Path) -> None:
     """test_domain requires at least one compiled policy with cedar."""
-    from cedrus import Case
 
     ws = build_workspace_photosflash(tmp_path)
     try:
@@ -815,7 +810,6 @@ def test_space_test_domain_uses_default_schema_when_none(tmp_path: Path) -> None
 
 def test_space_deploy_raises_when_verifier_rejects(tmp_path: Path) -> None:
     """deploy() with a non-passing verifier raises SpaceError unless skip_verify."""
-    from cedrus.need import Need
 
     ws = build_workspace_photosflash(tmp_path)
     try:
@@ -837,7 +831,7 @@ def test_space_deploy_raises_when_verifier_rejects(tmp_path: Path) -> None:
                 datetime.now(UTC).isoformat(),
             ),
         )
-        schema = ws.load_schema("hr")
+        ws.load_schema("hr")
         with pytest.raises(Exception):
             ws.deploy("hr", str(tmp_path / "out"), skip_verify=False)
     finally:
@@ -859,7 +853,7 @@ def test_space_list_compiled_policies_handles_orphan_fk(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 "HR-001", "hr", "HR-001",
-                'permit (principal, action, resource);',
+                "permit (principal, action, resource);",
                 "compiled",
                 datetime.now(UTC).isoformat(),
                 datetime.now(UTC).isoformat(),
@@ -878,7 +872,6 @@ def test_space_resolve_test_entities_returns_dicts(tmp_path: Path) -> None:
     """resolve_test_entities converts each entity to a dict."""
     from collections.abc import Mapping
 
-    from cedrus.space import Space
 
     ws = build_workspace_photosflash(tmp_path)
     try:
@@ -1005,7 +998,7 @@ def test_space_build_stored_report_round_trip(tmp_path: Path) -> None:
 
     ws = build_workspace_photosflash(tmp_path)
     schema = ws.load_schema("hr")
-    report = Vreport.from_cedar(['permit (principal, action, resource);'], schema)
+    report = Vreport.from_cedar(["permit (principal, action, resource);"], schema)
     stored = Space.build_stored_report("draft-HR-001", "validation", report)
     assert stored.policy_id == "draft-HR-001"
     assert stored.kind == "validation"
@@ -1017,7 +1010,7 @@ def test_space_init_domain_writes_seed_schema_atomically(tmp_path: Path) -> None
     """init_domain creates a real schema.json when the file is absent."""
     from cedrus import Space
 
-    ws = Space.in_memory()
+    Space.in_memory()
     target = tmp_path / "fresh" / "hr"
     target.mkdir(parents=True)
     # The test exercises the os.replace atomic-write path; the
@@ -1051,7 +1044,7 @@ def test_space_apply_for_requirement_with_valid_draft(tmp_path: Path) -> None:
             "VALUES (?, ?, ?, ?, ?)",
             ("HR-001", "hr", "body", "/tmp/x.md", datetime.now(UTC).isoformat()),
         )
-        need = Need.get(ws.repository, "HR-001")
+        Need.get(ws.repository, "HR-001")
         intent = Intent(
             id="hr-hr-001", requirement_id="HR-001", effect="permit",
             principal=Principal(kind="any"),
