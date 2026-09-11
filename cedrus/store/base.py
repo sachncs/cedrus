@@ -826,7 +826,12 @@ def load_intent_data(repo: Repository, intent_id: str) -> dict[str, Any]:
         (intent_id,),
     )
     return {
-        "intent": intent_row,
+        "id": intent_row["id"],
+        "effect": intent_row["effect"],
+        "requirement_id": intent_row["requirement_id"],
+        "principal_id": intent_row["principal_id"],
+        "action_id": intent_row["action_id"],
+        "resource_id": intent_row["resource_id"],
         "principals": principal_row,
         "actions": action_row,
         "resources": resource_row,
@@ -888,7 +893,7 @@ def fetch_draft_data(repo: Repository, row: dict[str, Any]) -> dict[str, Any]:
     unresolved = tuple(r["item"] for r in unresolved_rows)
     return {
         "drafts": row,
-        "intent": intent_data["intent"] if intent_data else None,
+        "intents": intent_data or None,
         "principals": principal.to_data(),
         "actions": action.to_data(),
         "resources": resource.to_data(),
