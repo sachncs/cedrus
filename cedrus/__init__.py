@@ -101,7 +101,7 @@ See Also:
 
 from __future__ import annotations
 
-from cedrus.case import Case, Outcome, Suite
+from cedrus.case import Case, Outcome, Run, Suite
 from cedrus.compile import Intent, Source
 from cedrus.deploy import (
     Bundler,
@@ -185,6 +185,7 @@ __all__ = [
     "Require",
     "Resource",
     "Result",
+    "Run",
     "Schema",
     "Scope",
     "ScopeFault",
