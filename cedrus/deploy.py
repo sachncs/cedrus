@@ -656,7 +656,8 @@ class Guard:
                 parsed_address = ipaddress.ip_address(ip_str)
             except ValueError:
                 continue
-            rejection = self.check_address(parsed_address, host)
+            normalized = self._normalize(parsed_address)
+            rejection = self.check_address(normalized, host)
             if rejection is None:
                 return Pin(
                     host=host,
@@ -695,6 +696,26 @@ class Guard:
                     "allow_private_targets=True to override"
                 )
         return None
+
+    @staticmethod
+    def _normalize(
+        parsed_address: ipaddress.IPv4Address | ipaddress.IPv6Address,
+    ) -> ipaddress.IPv4Address | ipaddress.IPv6Address:
+        """Return ``parsed_address`` mapped back to its IPv4 form if applicable.
+
+        ``ipaddress.IPv6Address('::ffff:127.0.0.1')`` is not a member
+        of any IPv4 blocked-network range (it has the full IPv6
+        form), so without a normalization step the guard would let
+        an IPv4-mapped loopback address through. Unwrap the mapped
+        form into the underlying IPv4 value before the membership
+        check. IPv6 addresses that are not mapped are returned as-is.
+        """
+        if (
+            isinstance(parsed_address, ipaddress.IPv6Address)
+            and parsed_address.ipv4_mapped is not None
+        ):
+            return parsed_address.ipv4_mapped
+        return parsed_address
 
 
 @dataclass(frozen=True, slots=True)
