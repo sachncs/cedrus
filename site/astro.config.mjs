@@ -10,4 +10,9 @@ export default defineConfig({
   build: {
     assets: "assets",
   },
+  vite: {
+    resolve: {
+      extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json"],
+    },
+  },
 });
