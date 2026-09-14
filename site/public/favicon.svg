@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="cedrus">
+  <title>cedrus</title>
+  <defs>
+    <linearGradient id="cedrusGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4c389"/>
+      <stop offset="55%" stop-color="#d4a574"/>
+      <stop offset="100%" stop-color="#894c28"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#06060a"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <!-- Stylized cedar tree: triangular tier silhouette -->
+  <path d="M32 11 L46 26 L40 26 L48 36 L40 36 L48 46 L16 46 L24 36 L16 36 L24 26 L18 26 Z"
+        fill="url(#cedrusGrad)"/>
+  <rect x="29" y="46" width="6" height="6" fill="url(#cedrusGrad)" opacity="0.85"/>
+</svg>

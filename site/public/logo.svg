@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" width="240" height="64" role="img" aria-label="cedrus">
+  <title>cedrus</title>
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4c389"/>
+      <stop offset="55%" stop-color="#d4a574"/>
+      <stop offset="100%" stop-color="#894c28"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(0,2)">
+    <rect width="60" height="60" rx="14" fill="#06060a"/>
+    <rect x="0.75" y="0.75" width="58.5" height="58.5" rx="13.25" fill="none" stroke="rgba(255,255,255,0.08)"/>
+    <path d="M30 9 L44 24 L38 24 L46 34 L38 34 L46 44 L14 44 L22 34 L14 34 L22 24 L16 24 Z"
+          fill="url(#lg)"/>
+    <rect x="27" y="44" width="6" height="6" fill="url(#lg)" opacity="0.85"/>
+  </g>
+  <g transform="translate(76,0)" font-family="InterDisplay, Inter, system-ui, sans-serif" font-weight="600" font-size="34" letter-spacing="-1.2">
+    <text x="0" y="44" fill="#f7f7f8">cedrus</text>
+    <circle cx="148" cy="22" r="3.2" fill="#d4a574"/>
+  </g>
+</svg>

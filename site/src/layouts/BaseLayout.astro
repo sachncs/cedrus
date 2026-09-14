@@ -1,0 +1,40 @@
+---
+import "~/styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "cedrus — The compiler for authorization intent",
+  description = "cedrus is the operating system for versioning, drafting, validating, verifying, and deploying Cedar policies at enterprise scale.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/cedrus/favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me" />
+    <link rel="preload" as="style" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#06060a" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

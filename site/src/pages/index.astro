@@ -1,0 +1,28 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import Nav from "~/components/Nav";
+import Hero from "~/components/Hero";
+import Problem from "~/components/Problem";
+import Pipeline from "~/components/Pipeline";
+import Features from "~/components/Features";
+import CodeShowcase from "~/components/CodeShowcase";
+import UseCases from "~/components/UseCases";
+import Metrics from "~/components/Metrics";
+import CTA from "~/components/CTA";
+import Footer from "~/components/Footer";
+---
+
+<BaseLayout>
+  <Nav client:load />
+  <main>
+    <Hero client:load />
+    <Problem client:visible />
+    <Pipeline client:visible />
+    <Features client:visible />
+    <Metrics client:visible />
+    <CodeShowcase client:visible />
+    <UseCases client:visible />
+    <CTA client:visible />
+  </main>
+  <Footer />
+</BaseLayout>
