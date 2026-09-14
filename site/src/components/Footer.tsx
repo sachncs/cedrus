@@ -1,4 +1,4 @@
-import { footerLinks, site } from "~/lib/data";
+import { footerLinks, site } from "../lib/data";
 
 export default function Footer() {
   const year = new Date().getFullYear();

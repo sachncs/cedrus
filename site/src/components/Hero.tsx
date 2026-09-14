@@ -1,4 +1,4 @@
-import { cedarOutput } from "~/lib/data";
+import { cedarOutput } from "../lib/data";
 
 function escape(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

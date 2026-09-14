@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { site } from "~/lib/data";
+import { site } from "../lib/data";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);

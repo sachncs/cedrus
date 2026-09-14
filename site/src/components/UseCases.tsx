@@ -1,5 +1,5 @@
 import Reveal from "./Reveal";
-import { useCases } from "~/lib/data";
+import { useCases } from "../lib/data";
 
 const logos = [
   "Cedar",
