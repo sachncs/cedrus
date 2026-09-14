@@ -18,9 +18,11 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: [
+        { find: /^~\/(.*?)\.tsx?$/, replacement: `${SRC}/$1.ts` },
         { find: /^~\/(.*)$/, replacement: `${SRC}/$1` },
         { find: "~", replacement: SRC },
       ],
+      extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json"],
     },
     build: {
       cssCodeSplit: true,
