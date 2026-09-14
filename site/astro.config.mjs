@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SRC = path.resolve(__dirname, "src");
 
 export default defineConfig({
   site: "https://sachncs.github.io",
@@ -16,9 +17,10 @@ export default defineConfig({
   },
   vite: {
     resolve: {
-      alias: {
-        "~": path.resolve(__dirname, "src"),
-      },
+      alias: [
+        { find: /^~\/(.*)$/, replacement: `${SRC}/$1` },
+        { find: "~", replacement: SRC },
+      ],
     },
     build: {
       cssCodeSplit: true,
