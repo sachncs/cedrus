@@ -1,5 +1,5 @@
 import Reveal from "./Reveal";
-import { cliSnippets, apiSnippet } from "../lib/data";
+import { cliSnippets, apiSnippet } from "../lib/data.ts";
 
 function escape(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

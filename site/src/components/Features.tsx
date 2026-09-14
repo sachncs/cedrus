@@ -1,5 +1,5 @@
 import Reveal from "./Reveal";
-import { features } from "../lib/data";
+import { features } from "../lib/data.ts";
 
 function FeatureIcon({ id }: { id: string }) {
   const icons: Record<string, React.ReactNode> = {
