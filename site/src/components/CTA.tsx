@@ -1,5 +1,5 @@
 import Reveal from "./Reveal";
-import { site } from "../lib/data.ts";
+import { site } from "../content/data.ts";
 
 export default function CTA() {
   return (

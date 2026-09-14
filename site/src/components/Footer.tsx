@@ -1,4 +1,4 @@
-import { footerLinks, site } from "../lib/data.ts";
+import { footerLinks, site } from "../content/data.ts";
 
 export default function Footer() {
   const year = new Date().getFullYear();

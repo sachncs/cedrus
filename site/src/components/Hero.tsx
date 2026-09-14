@@ -1,4 +1,4 @@
-import { cedarOutput } from "../lib/data.ts";
+import { cedarOutput } from "../content/data.ts";
 
 function escape(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

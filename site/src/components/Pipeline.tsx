@@ -1,5 +1,5 @@
 import Reveal from "./Reveal";
-import { pipelineStages } from "../lib/data.ts";
+import { pipelineStages } from "../content/data.ts";
 
 export default function Pipeline() {
   return (

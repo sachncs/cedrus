@@ -25,6 +25,11 @@ env/
 ENV/
 .env/
 
+# Override: keep site/src/{lib,content} etc. — the Python wheel
+# exclusion pattern `lib/` must not swallow site subdirectories.
+/!site/src/lib/
+/!site/src/content/
+
 # Workspace runtime storage: SQLite database plus SQLite write-ahead log
 # files produced by cedrus at runtime. The directory is created by
 # ``cedrus init`` and must never be committed because it contains
