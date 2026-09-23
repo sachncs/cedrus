@@ -20,7 +20,7 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install package and development tools
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,llm]"
       - name: Run ruff check
         run: python -m ruff check .
 
