@@ -52,7 +52,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Install package
-        run: pip install -e ".[test]"
+        run: pip install -e ".[test,llm]"
       - name: Run pytest with coverage
         run: |
           pytest --cov=cedrus --cov-report=term --cov-report=xml --cov-fail-under=87
@@ -131,7 +131,7 @@ jobs:
       - name: Audit dependencies
         run: |
           python -m pip install --upgrade pip-audit
-          python -m pip install .
+          python -m pip install ".[llm]"
           pip-audit
       - name: Scan repository for secrets
         uses: gitleaks/gitleaks-action@v2

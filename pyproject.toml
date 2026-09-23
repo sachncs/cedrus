@@ -47,7 +47,6 @@ test = [
     "pytest>=8",
     "pytest-cov>=5",
     "pytest-httpx>=0.30",
-    "litellm>=1,<2",
 ]
 
 [project.urls]

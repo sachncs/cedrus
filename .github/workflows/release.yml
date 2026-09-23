@@ -33,7 +33,7 @@ jobs:
           "
           python scripts/check_release_consistency.py '${{ github.ref_name }}'
       - name: Install package
-        run: pip install -e ".[test]"
+        run: pip install -e ".[test,llm]"
       - name: Run pytest with coverage
         run: pytest --cov=cedrus --cov-fail-under=87
 
