@@ -7,8 +7,8 @@ the test suite against `cedrus/`. Run locally with:
 .venv/bin/python -m pytest tests/ --cov=cedrus --cov-report=term
 ```
 
-The test suite lives under `tests/` and contains 564 tests across
-20 modules:
+The test suite lives under `tests/` and contains 569 tests across
+21 modules:
 
 - `test_cli.py` / `test_cli_ergonomics.py` — argparse and helper
   paths.
@@ -36,9 +36,9 @@ The test suite lives under `tests/` and contains 564 tests across
   method (open, create, in_memory, add_requirement_*,
   list_compiled_policies, build_bundle, export_domain, etc.).
 
-## Current coverage (Python 3.12, 567 tests)
+## Current coverage (Python 3.14, 569 tests)
 
-The latest verification reports **91.18%** coverage: 2,759 of 3,026
+The latest local verification reports **91.21%** coverage: 2,782 of 3,050
 statements covered. CI remains authoritative for the release gate.
 
 | Module                              | Statements | Missed | Coverage |

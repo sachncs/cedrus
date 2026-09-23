@@ -21,6 +21,7 @@ from cedrus import (
     Resource,
     Schema,
     Space,
+    Store,
     Vreport,
 )
 from cedrus.space import (
@@ -104,6 +105,15 @@ def test_space_close_is_idempotent(tmp_path: Path) -> None:
     ws = Space.open(tmp_path)
     ws.close()
     ws.close()  # no-op
+
+
+def test_space_context_manager_closes_repository(tmp_path: Path) -> None:
+    workspace = Space.create(tmp_path)
+    with workspace as managed:
+        assert managed is workspace
+        assert managed.repository.fetch("SELECT 1 AS value")[0]["value"] == 1
+    with pytest.raises(Store, match="closed"):
+        workspace.repository.fetch("SELECT 1")
 
 
 def test_space_storage_path_is_under_dot_cedrus(tmp_path: Path) -> None:

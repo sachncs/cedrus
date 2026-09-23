@@ -64,7 +64,7 @@ import contextlib
 import sqlite3
 import threading
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 from cedrus.error import Store
 
@@ -279,6 +279,7 @@ class Backend:
     path: Path
     connection: sqlite3.Connection = field(init=False)
     lock: threading.RLock = field(init=False, repr=False)
+    closed: bool = field(init=False, default=False)
 
     def __post_init__(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -363,8 +364,35 @@ class Backend:
         Idempotent: subsequent calls are no-ops because the underlying
         :class:`sqlite3.Connection.close` is itself idempotent.
         """
+        if self.closed:
+            return
         with contextlib.suppress(sqlite3.ProgrammingError):
             self.connection.close()
+        self.closed = True
+
+    def __del__(self) -> None:
+        """Best-effort cleanup for short-lived backends.
+
+        Application code should still use :meth:`close` or the context
+        manager.  The finalizer prevents abandoned in-memory repositories
+        and failed setup paths from leaking SQLite connections.
+        """
+        with contextlib.suppress(Exception):
+            self.close()
+
+    def __enter__(self) -> Self:
+        """Return this backend for use as a context manager."""
+        self.ensure_open()
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        """Close the backend when leaving a context manager."""
+        self.close()
+
+    def ensure_open(self) -> None:
+        """Raise Store instead of leaking closed-connection errors."""
+        if self.closed:
+            raise Store("sqlite backend is closed")
 
     def fetch(
         self,
@@ -390,6 +418,7 @@ class Backend:
         Returns:
             A list of row dicts (empty when the query returns no rows).
         """
+        self.ensure_open()
         with self.lock:
             return [
                 dict(row) for row in self.connection.execute(query, params).fetchall()
@@ -411,6 +440,7 @@ class Backend:
             query: SQL ``INSERT`` / ``UPDATE`` / ``DELETE`` statement.
             params: Named (dict) or positional (tuple) placeholders.
         """
+        self.ensure_open()
         with self.lock:
             self.connection.execute(query, params)
 
@@ -456,10 +486,12 @@ class Backend:
         Returns:
             A context manager.
         """
+        self.ensure_open()
         import contextlib
 
         @contextlib.contextmanager
         def _cm() -> Any:
+            self.ensure_open()
             with self.lock, self.connection:
                 yield None
 

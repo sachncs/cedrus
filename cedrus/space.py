@@ -49,7 +49,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Self, cast
 
 from cedrus.case import Case, Run, Suite
 from cedrus.compile import Intent
@@ -932,6 +932,14 @@ class Space:
         """
         if hasattr(self.repository, "close") and callable(self.repository.close):
             self.repository.close()
+
+    def __enter__(self) -> Self:
+        """Return this workspace for use as a context manager."""
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        """Close the workspace when leaving a context manager."""
+        self.close()
 
     @staticmethod
     def build_context(

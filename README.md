@@ -70,7 +70,7 @@ gone (the `Workspace` alias, the `migrate` subcommand, the
 `validate_headers` free-function wrappers, the
 `cedrus.data.persist` duplicate module). The full what + why
 of every change is in [CHANGELOG.md](CHANGELOG.md); the test
-suite now contains **567 tests across 21 modules with 91.18% line
+suite now contains **569 tests across 21 modules with 91.21% line
 coverage**. The 0.4.0 / 0.5.0 / 0.6.0
 history is preserved below.
 
@@ -150,10 +150,17 @@ git clone https://github.com/sachncs/cedrus.git
 cd cedrus
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[test,llm]"
+pip install -e ".[dev,llm]"
 ```
 
 ### Run from a release
+
+For a complete contributor environment, including the Astro site, run
+the repository bootstrap script and then the standard checks:
+
+    ./scripts/bootstrap.sh
+    make check
+    make site-check
 
 ```bash
 pip install cedrus
@@ -405,7 +412,7 @@ cedrus/
 │   ├── python-api.md
 │   └── verification.md
 ├── examples/                        # runnable end-to-end examples
-├── tests/                           # 567 tests across 21 files
+├── tests/                           # 569 tests across 21 files
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
@@ -446,8 +453,8 @@ cedrus/
 .venv/bin/python -m pytest --cov=cedrus --cov-report=term-missing
 ```
 
-The test suite has 564 tests across 20 modules. Coverage is
-**91.18%** (267 / 3026 stmts uncovered). The remaining gaps are mostly
+The test suite has 569 tests across 20 modules. Coverage is
+**91.21%** (268 / 3050 stmts uncovered). The remaining gaps are mostly
 defensive error paths in `deploy.py` (HTTP transport edge cases),
 the verifier AST helper edge cases, and `space.apply` failure
 paths. See [docs/coverage.md](docs/coverage.md) for the per-module
@@ -458,7 +465,7 @@ breakdown.
 ## Build
 
 ```bash
-.venv/bin/pip install -e ".[test]"      # editable install
+.venv/bin/pip install -e ".[dev]"       # editable install
 .venv/bin/python -c "import cedrus"      # smoke test the import
 ```
 
@@ -477,8 +484,8 @@ publishes through PyPI trusted publishing.
 
 When a tagged release is eventually produced, each release will:
 
-- Run the full test matrix on Python 3.11, 3.12 and 3.13 with a
-  90% coverage gate.
+- Run the full test matrix on Python 3.11, 3.12 and 3.13 with an
+  87% coverage gate.
 - Build an sdist and a wheel via `python -m build`.
 - Publish to PyPI via `pypa/gh-action-pypi-publish`.
 - Generate a SBOM (CycloneDX) and sign the wheel with sigstore
@@ -487,7 +494,7 @@ When a tagged release is eventually produced, each release will:
   commit log.
 
 Until then, install from a clone with
-`pip install -e ".[test]"` and treat the package as
+`pip install -e ".[dev]"` and treat the package as
 "reproducible-from-source, not yet distributed". See
 [CHANGELOG.md](CHANGELOG.md) for the historical changelog.
 
@@ -533,7 +540,7 @@ The full source documentation lives under **[docs/](docs/)**:
 
 ## Roadmap
 
-- **v0.8.0** — Planned. Multi-region replication (Postgres via the
+- **v0.9.0** — Planned. Multi-region replication (Postgres via the
   existing `Repository` interface, no domain-package changes).
   CRDT settings for collaborative workspace editing. gRPC-over-UDS
   transport for the optional plugin runtime. Detailed scheduling is

@@ -31,7 +31,10 @@ git clone https://github.com/sachncs/cedrus.git
 cd cedrus
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[test]"
+pip install -e ".[dev,llm]"
+
+# Or bootstrap Python and the Astro site in one command.
+./scripts/bootstrap.sh
 ```
 
 ## Pull request workflow
@@ -44,9 +47,9 @@ pip install -e ".[test]"
 4. Run the local quality gates before pushing:
 
    ```bash
-   ruff check .
-   mypy
-   pytest --cov=cedrus --cov-report=term-missing
+   make check
+   make build
+   make site-check
    ```
 
    Coverage must stay above 87%. The full suite must pass on every

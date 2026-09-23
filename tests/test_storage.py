@@ -75,6 +75,15 @@ def test_memory_satisfies_repository_protocol() -> None:
     assert isinstance(repo, Repository)
 
 
+def test_backend_context_manager_closes_and_reports_use_after_close(tmp_path: Path) -> None:
+    backend = Backend(tmp_path / "store.db")
+    with backend as managed:
+        assert managed is backend
+        assert managed.fetch("SELECT 1 AS value")[0]["value"] == 1
+    with pytest.raises(Store, match="closed"):
+        backend.fetch("SELECT 1")
+
+
 def test_memory_add_and_get_requirement() -> None:
     repo = Memory()
     make_requirement("hr-001").save(repo)
