@@ -34,6 +34,14 @@ export default function CTA() {
                   </svg>
                 </a>
                 <a
+                  href={site.pypi}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-ghost h-12 px-6 text-[14px]"
+                >
+                  <span>Install from PyPI</span>
+                </a>
+                <a
                   href={site.repo}
                   target="_blank"
                   rel="noreferrer"

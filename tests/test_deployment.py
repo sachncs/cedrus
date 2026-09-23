@@ -315,6 +315,16 @@ def test_client_local_deploy_writes_to_directory(tmp_path: Path) -> None:
     assert (tmp_path / "out" / "bundle.cedar").exists()
 
 
+def test_deployment_record_carries_only_signature_metadata(tmp_path: Path) -> None:
+    manifest = build_test_manifest().signed(HMACSigner("test-secret"))
+    record = Client().deploy_local(manifest, tmp_path / "signed")
+    assert record.response == {
+        "signed": "true",
+        "signature_algorithm": "hmac-sha256",
+    }
+    assert "test-secret" not in str(record.to_data())
+
+
 def test_client_local_deploy_uses_supplied_record_id(tmp_path: Path) -> None:
     client = Client(timeout=30)
     record = client.deploy_local(build_test_manifest(), tmp_path / "out", record_id="custom-id")

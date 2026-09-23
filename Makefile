@@ -1,4 +1,4 @@
-.PHONY: setup test lint typecheck check build site-install site-check
+.PHONY: setup test lint typecheck check build site-install site-check release-check
 
 PYTHON ?= .venv/bin/python
 PIP ?= .venv/bin/pip
@@ -26,4 +26,9 @@ site-install:
 
 site-check:
 	cd site && npm audit --audit-level=high
-	cd site && npm run build
+	cd site && npm run build && cp dist/index.html dist/404.html && touch dist/.nojekyll
+	$(PYTHON) scripts/check_site.py site/dist
+
+release-check:
+	$(PYTHON) scripts/check_release_consistency.py
+	$(PYTHON) scripts/check_markdown_links.py README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md SUPPORT.md RELEASE_CHECKLIST.md

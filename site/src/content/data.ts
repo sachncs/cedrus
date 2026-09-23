@@ -1,3 +1,5 @@
+import packageJson from "../../package.json";
+
 export const site = {
   name: "cedrus",
   tagline: "The compiler for authorization intent",
@@ -5,7 +7,9 @@ export const site = {
     "cedrus is the operating system for versioning, drafting, validating, verifying, and deploying Cedar policies at enterprise scale.",
   repo: "https://github.com/sachncs/cedrus",
   url: "https://sachncs.github.io/cedrus",
-  version: "v0.8.0",
+  version: `v${packageJson.version}`,
+  pypi: "https://pypi.org/project/cedrus/",
+  releases: "https://github.com/sachncs/cedrus/releases",
   license: "Apache 2.0",
 };
 
@@ -203,6 +207,8 @@ export const footerLinks = {
   ],
   project: [
     { label: "Repository", href: "https://github.com/sachncs/cedrus" },
+    { label: "PyPI", href: site.pypi },
+    { label: "Releases", href: site.releases },
     { label: "Documentation", href: "https://github.com/sachncs/cedrus/blob/main/README.md" },
     { label: "CHANGELOG", href: "https://github.com/sachncs/cedrus/blob/main/CHANGELOG.md" },
     { label: "Roadmap", href: "https://github.com/sachncs/cedrus/blob/main/todo.md" },

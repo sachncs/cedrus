@@ -58,8 +58,8 @@ def main(argv: list[str]) -> int:
         return 2
     code, missing = _check([Path(arg) for arg in argv])
     if code != 0:
-        for _line in missing:
-            pass
+        for line in missing:
+            sys.stderr.write(f"{line}\n")
     return code
 
 

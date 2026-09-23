@@ -216,6 +216,13 @@ class Manifest:
         if not signer.verify(self.signing_bytes(), self.signature):
             raise Deploy("deployment manifest signature verification failed")
 
+    def signature_metadata(self) -> dict[str, str]:
+        """Return non-secret signature metadata for deployment records."""
+        metadata = {"signed": str(self.signature is not None).lower()}
+        if self.signature_algorithm:
+            metadata["signature_algorithm"] = self.signature_algorithm
+        return metadata
+
     def to_dict(self) -> Mapping[str, Any]:
         """Return a JSON-friendly representation including the Cedar source.
 
@@ -1176,6 +1183,7 @@ class Client:
             bundle_hash=manifest.bundle_hash,
             status="deployed",
             created_at=datetime.now(UTC),
+            response=manifest.signature_metadata(),
         )
 
     def deploy_http(
@@ -1265,15 +1273,11 @@ class Client:
                             status="deployed",
                             created_at=datetime.now(UTC),
                             response={
+                                **manifest.signature_metadata(),
                                 "status_code": str(response.status_code),
                                 "body_sha256": response_sha,
                                 "idempotency_key": idem,
                                 "retry_count": str(attempt),
-                                **(
-                                    {"signature_algorithm": manifest.signature_algorithm}
-                                    if manifest.signature_algorithm
-                                    else {}
-                                ),
                             },
                         )
                     if response.status_code in {429, 503} and attempt < self.max_retries:

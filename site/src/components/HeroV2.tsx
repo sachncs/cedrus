@@ -18,7 +18,7 @@ export default function HeroV2() {
       <div className="container-x">
         <div className="grid items-center gap-14 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
           <div className="max-w-xl animate-fade-up">
-            <a href="https://github.com/sachncs/cedrus/releases" target="_blank" rel="noreferrer" className="group mb-7 inline-flex items-center gap-2 rounded-full border border-cedar-500/25 bg-cedar-500/[0.08] px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.14em] text-cedar-200 transition-colors hover:border-cedar-400/50 hover:bg-cedar-500/[0.14]">
+            <a href={site.releases} target="_blank" rel="noreferrer" className="group mb-7 inline-flex items-center gap-2 rounded-full border border-cedar-500/25 bg-cedar-500/[0.08] px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.14em] text-cedar-200 transition-colors hover:border-cedar-400/50 hover:bg-cedar-500/[0.14]">
               <span className="dot" />
               {site.version} · open source
               <span className="text-cedar-400 transition-transform group-hover:translate-x-0.5">↗</span>

@@ -48,6 +48,9 @@ jobs:
         working-directory: site
         run: touch dist/.nojekyll
 
+      - name: Smoke-test generated site
+        run: python scripts/check_site.py site/dist
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

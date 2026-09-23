@@ -53,9 +53,11 @@ bundle and should use the same idempotency key to deduplicate retries.
 
 A `Record` row is also written to `deployments` capturing the
 deployment id (a fresh `cedrus.utils.id()`), target path or URL,
-target kind (`local` or `http`), bundle hash, and a bounded subset
-of the HTTP response (status code, body SHA-256, idempotency key,
-retry count). The HTTP response body is never persisted in clear.
+target kind (`local` or `http`), bundle hash, and non-secret signature
+metadata (`signed` and, when present, `signature_algorithm`). HTTP
+records additionally contain a bounded subset of the response (status
+code, body SHA-256, idempotency key, retry count). The HTTP response
+body and signing secret are never persisted in clear.
 
 ## Integrity verification
 

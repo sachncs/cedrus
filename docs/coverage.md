@@ -7,7 +7,7 @@ the test suite against `cedrus/`. Run locally with:
 .venv/bin/python -m pytest tests/ --cov=cedrus --cov-report=term
 ```
 
-The test suite lives under `tests/` and contains 569 tests across
+The test suite lives under `tests/` and contains 570 tests across
 21 modules:
 
 - `test_cli.py` / `test_cli_ergonomics.py` — argparse and helper
@@ -36,56 +36,50 @@ The test suite lives under `tests/` and contains 569 tests across
   method (open, create, in_memory, add_requirement_*,
   list_compiled_policies, build_bundle, export_domain, etc.).
 
-## Current coverage (Python 3.14, 569 tests)
+## Current coverage (Python 3.14, 570 tests)
 
-The latest local verification reports **91.21%** coverage: 2,782 of 3,050
+The latest local verification reports **91.23%** coverage: 2,787 of 3,055
 statements covered. CI remains authoritative for the release gate.
 
 | Module                              | Statements | Missed | Coverage |
 | ----------------------------------- | ----------: | -----: | -------: |
 | `cedrus/__init__.py`                |          19 |      0 |    100 % |
 | `cedrus/__main__.py`                |           3 |      0 |    100 % |
-| `cedrus/case.py`                    |          74 |      7 |     91 % |
-| `cedrus/cli.py`                     |         356 |     35 |     90 % |
-| `cedrus/compile.py`                 |         123 |      3 |     98 % |
+| `cedrus/case.py`                    |          73 |      7 |     90 % |
+| `cedrus/cli.py`                     |         358 |     35 |     90 % |
+| `cedrus/compile.py`                 |         122 |      2 |     98 % |
 | `cedrus/data/__init__.py`           |           4 |      0 |    100 % |
-| `cedrus/data/transit.py`            |          30 |      0 |    100 % |
-| `cedrus/data/unresolved.py`         |          19 |      1 |     95 % |
-| `cedrus/data/wire.py`               |         114 |      7 |     94 % |
-| `cedrus/deploy.py`                  |         415 |     56 |     87 % |
-| `cedrus/domain.py`                  |          67 |      5 |     93 % |
+| `cedrus/data/transit.py`            |          27 |      0 |    100 % |
+| `cedrus/data/unresolved.py`         |          19 |      2 |     89 % |
+| `cedrus/data/wire.py`               |         112 |      6 |     95 % |
+| `cedrus/deploy.py`                  |         470 |     57 |     88 % |
+| `cedrus/domain.py`                  |          64 |      4 |     94 % |
 | `cedrus/error.py`                   |          18 |      0 |    100 % |
 | `cedrus/generate/__init__.py`       |           4 |      0 |    100 % |
 | `cedrus/generate/base.py`           |          15 |      0 |    100 % |
-| `cedrus/generate/litellm.py`        |         114 |      9 |     92 % |
+| `cedrus/generate/litellm.py`        |         124 |     11 |     91 % |
 | `cedrus/generate/offline.py`        |          32 |      2 |     94 % |
-| `cedrus/need.py`                    |         101 |      2 |     98 % |
+| `cedrus/need.py`                    |          99 |      2 |     98 % |
 | `cedrus/policies/__init__.py`       |           5 |      0 |    100 % |
-| `cedrus/policies/base.py`           |          37 |      2 |     95 % |
-| `cedrus/policies/compiled.py`       |          31 |      1 |     97 % |
-| `cedrus/policies/draft.py`          |          63 |      0 |    100 % |
-| `cedrus/policies/existing.py`       |          25 |      0 |    100 % |
-| `cedrus/schema.py`                  |         112 |     11 |     90 % |
+| `cedrus/policies/base.py`           |          35 |      2 |     94 % |
+| `cedrus/policies/compiled.py`       |          27 |      1 |     96 % |
+| `cedrus/policies/draft.py`          |          60 |      0 |    100 % |
+| `cedrus/policies/existing.py`       |          22 |      0 |    100 % |
+| `cedrus/schema.py`                  |         111 |     11 |     90 % |
 | `cedrus/scope.py`                   |         186 |      6 |     97 % |
-| `cedrus/space.py`                   |         307 |     46 |     85 % |
+| `cedrus/space.py`                   |         325 |     40 |     88 % |
 | `cedrus/store/__init__.py`          |           4 |      0 |    100 % |
-| `cedrus/store/base.py`              |         229 |     24 |     90 % |
+| `cedrus/store/base.py`              |         229 |     23 |     90 % |
 | `cedrus/store/memory.py`            |          17 |      0 |    100 % |
-| `cedrus/store/sqlite.py`            |          62 |      5 |     92 % |
+| `cedrus/store/sqlite.py`            |          91 |      5 |     95 % |
 | `cedrus/utils.py`                   |           9 |      0 |    100 % |
-| `cedrus/validate.py`                |          43 |      8 |     81 % |
-| `cedrus/verify.py`                  |         330 |     44 |     87 % |
-| **TOTAL**                           |     **2968** | **274** | **91 %** |
+| `cedrus/validate.py`                |          42 |      8 |     81 % |
+| `cedrus/verify.py`                  |         329 |     44 |     87 % |
+| **TOTAL**                           |     **3055** | **268** | **91 %** |
 
-## Areas intentionally not covered
+## Remaining coverage gaps
 
-- `deploy.py` HTTP transport: requires a running test server to
-  exercise the request/response loop end-to-end. The pin / guard /
-  header-validation paths are unit-tested instead.
-- `verify.py` AST parser helpers (`parse_principal_node`,
-  `parse_action_node`, `parse_resource_node`, `parse_conditions`):
-  defensive edge cases that the happy-path tests already exercise
-  end-to-end.
-- `space.apply` failure paths (scenarios, unresolved items): the
-  happy path is covered; the error branches require a fully wired
-  test harness.
+- Defensive transport and malformed-input branches in `deploy.py`,
+  `verify.py`, and `space.py` remain below full coverage. CI enforces
+  the 87% project-wide gate, while new security and deployment paths
+  must include focused regression tests.

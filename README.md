@@ -70,7 +70,7 @@ gone (the `Workspace` alias, the `migrate` subcommand, the
 `validate_headers` free-function wrappers, the
 `cedrus.data.persist` duplicate module). The full what + why
 of every change is in [CHANGELOG.md](CHANGELOG.md); the test
-suite now contains **569 tests across 21 modules with 91.21% line
+suite now contains **570 tests across 21 modules with 91.23% line
 coverage**. The 0.4.0 / 0.5.0 / 0.6.0
 history is preserved below.
 
@@ -412,7 +412,7 @@ cedrus/
 │   ├── python-api.md
 │   └── verification.md
 ├── examples/                        # runnable end-to-end examples
-├── tests/                           # 569 tests across 21 files
+├── tests/                           # 570 tests across 21 files
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
@@ -453,8 +453,8 @@ cedrus/
 .venv/bin/python -m pytest --cov=cedrus --cov-report=term-missing
 ```
 
-The test suite has 569 tests across 20 modules. Coverage is
-**91.21%** (268 / 3050 stmts uncovered). The remaining gaps are mostly
+The test suite has 570 tests across 21 modules. Coverage is
+**91.23%** (268 / 3055 stmts uncovered). The remaining gaps are mostly
 defensive error paths in `deploy.py` (HTTP transport edge cases),
 the verifier AST helper edge cases, and `space.apply` failure
 paths. See [docs/coverage.md](docs/coverage.md) for the per-module

@@ -48,8 +48,6 @@ test = [
     "pytest-cov>=5",
     "pytest-httpx>=0.30",
     "litellm>=1,<2",
-    "build>=1.2",
-    "twine>=5",
 ]
 
 [project.urls]
