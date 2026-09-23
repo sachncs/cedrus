@@ -108,9 +108,11 @@ from cedrus.deploy import (
     Bundler,
     Client,
     Guard,
+    HMACSigner,
     Manifest,
     Pin,
     Record,
+    Signer,
     Transport,
 )
 from cedrus.domain import Domain
@@ -144,7 +146,7 @@ from cedrus.store import Backend, Memory, Repository
 from cedrus.validate import Validator, Vreport
 from cedrus.verify import Extraction, Finding, Report, Verifier
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 __all__ = [
     "Action",
@@ -168,6 +170,7 @@ __all__ = [
     "Generate",
     "Generator",
     "Guard",
+    "HMACSigner",
     "Intent",
     "Kind",
     "Llm",
@@ -190,6 +193,7 @@ __all__ = [
     "Schema",
     "Scope",
     "ScopeFault",
+    "Signer",
     "Source",
     "Space",
     "SpaceError",

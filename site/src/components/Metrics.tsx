@@ -1,15 +1,16 @@
 import Reveal from "./Reveal";
+import { site } from "../content/data.ts";
 
 const facts = [
   {
-    k: "v0.7.0",
-    v: "Data-model rewrite + verifier",
-    body: "Every backward-compat shim from 0.6.0 is gone. The Workspace alias, the migrate subcommand, and the free-function wrappers — all retired.",
+    k: site.version,
+    v: "Production-ready release",
+    body: "A typed authorization compiler with deterministic Cedar output, static verification, and auditable deployment bundles.",
   },
   {
-    k: "561",
-    v: "Tests across 21 modules",
-    body: "Up from ~100 tests across ~10 modules. 91% line coverage, type-checked with mypy strict, linted with ruff.",
+    k: "typed",
+    v: "Python API + CLI",
+    body: "The public package and command-line workflow share the same typed contracts and validation gates.",
   },
   {
     k: "deterministic",

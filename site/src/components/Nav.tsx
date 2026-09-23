@@ -38,7 +38,7 @@ export default function Nav() {
             cedrus
           </span>
           <span className="hidden sm:inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] font-mono text-ink-300">
-            v0.7.0
+            {site.version}
           </span>
         </a>
 

@@ -17,6 +17,7 @@ from cedrus.deploy import (
     Bundler,
     Client,
     Guard,
+    HMACSigner,
     Manifest,
     Pin,
     Record,
@@ -56,6 +57,36 @@ def test_manifest_to_manifest_payload_excludes_cedar() -> None:
     d = manifest.to_manifest_payload()
     assert "cedar" not in d
     assert d["domain"] == "hr"
+
+
+def test_hmac_signer_round_trips_and_does_not_serialize_secret() -> None:
+    manifest = build_test_manifest()
+    signer = HMACSigner("test-secret")
+    signed = manifest.signed(signer)
+    signed.verify(signer)
+    assert signed.signature_algorithm == "hmac-sha256"
+    assert "test-secret" not in str(signed.to_dict())
+
+
+def test_hmac_signer_rejects_tampering() -> None:
+    manifest = build_test_manifest().signed(HMACSigner("test-secret"))
+    tampered = Manifest(
+        domain=manifest.domain,
+        cedar=manifest.cedar,
+        bundle_hash=manifest.bundle_hash,
+        policy_ids=manifest.policy_ids,
+        created_at=manifest.created_at,
+        metadata={"env": "tampered"},
+        signature=manifest.signature,
+        signature_algorithm=manifest.signature_algorithm,
+    )
+    with pytest.raises(Exception, match="signature verification failed"):
+        tampered.verify(HMACSigner("test-secret"))
+
+
+def test_hmac_signer_rejects_empty_secret() -> None:
+    with pytest.raises(Exception, match="secret"):
+        HMACSigner("")
 
 
 # ---------------------------------------------------------------------------

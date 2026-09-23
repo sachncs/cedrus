@@ -5,13 +5,11 @@ export const site = {
     "cedrus is the operating system for versioning, drafting, validating, verifying, and deploying Cedar policies at enterprise scale.",
   repo: "https://github.com/sachncs/cedrus",
   url: "https://sachncs.github.io/cedrus",
-  version: "v0.7.0",
+  version: "v0.8.0",
   license: "Apache 2.0",
 };
 
 export const heroStats = [
-  { label: "Tests", value: "561" },
-  { label: "Coverage", value: "91%" },
   { label: "Python", value: "3.11+" },
   { label: "License", value: "Apache 2.0" },
 ];

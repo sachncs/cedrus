@@ -13,6 +13,24 @@ can find when it was introduced.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-23
+
+### Added
+
+- Optional llm installation extra; the core package no longer requires LiteLLM.
+- HMAC-SHA-256 manifest signing and verification through HMACSigner.
+- Structured deployment logging and package/release security checks.
+
+### Changed
+
+- Corrected package metadata so sdist and wheel builds pass PyPI validation.
+- Updated the landing site to use the /cedrus canonical URL and 0.8.0 metadata.
+
+### Migration
+
+- Existing 0.7.x installations continue to work without code changes.
+- Install cedrus[llm] when using cedrus.Llm; the base install omits LiteLLM.
+
 ## [0.7.0] - 2026-08-13
 
 A cleanup release. Every redundant free function is gone, every

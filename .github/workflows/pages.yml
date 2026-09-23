@@ -3,6 +3,7 @@ name: Deploy site to GitHub Pages
 on:
   push:
     branches: [main]
+    tags: ["v*.*.*"]
   workflow_dispatch:
 
 permissions:
@@ -23,7 +24,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: site/package-lock.json
 
@@ -34,6 +35,10 @@ jobs:
       - name: Build
         working-directory: site
         run: npm run build
+
+      - name: Audit site dependencies
+        working-directory: site
+        run: npm audit --audit-level=high
 
       - name: Copy 404 page
         working-directory: site

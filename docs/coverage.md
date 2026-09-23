@@ -36,7 +36,10 @@ The test suite lives under `tests/` and contains 564 tests across
   method (open, create, in_memory, add_requirement_*,
   list_compiled_policies, build_bundle, export_domain, etc.).
 
-## Current coverage (run `pytest --cov=cedrus --cov-report=term-missing`)
+## Current coverage (Python 3.12, 567 tests)
+
+The latest verification reports **91.18%** coverage: 2,759 of 3,026
+statements covered. CI remains authoritative for the release gate.
 
 | Module                              | Statements | Missed | Coverage |
 | ----------------------------------- | ----------: | -----: | -------: |

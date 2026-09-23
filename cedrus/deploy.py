@@ -70,8 +70,10 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
+import hmac
 import ipaddress
 import json
+import logging
 import math
 import os
 import shutil
@@ -84,7 +86,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 import httpx
 
@@ -97,6 +99,8 @@ if TYPE_CHECKING:
 
 DEPLOYMENT_KIND_LOCAL = "local"
 DEPLOYMENT_KIND_HTTP = "http"
+
+logger = logging.getLogger(__name__)
 
 #: Maximum number of bytes of the HTTP response body to hash. The
 #: body is also bounded at read time so that a streaming or
@@ -118,6 +122,42 @@ RESERVED_HEADERS = frozenset(
 )
 
 
+class Signer(Protocol):
+    """Sign and verify the canonical, unsigned manifest payload."""
+
+    algorithm: str
+
+    def sign(self, payload: bytes) -> str:
+        """Return an encoded signature for payload."""
+
+    def verify(self, payload: bytes, signature: str) -> bool:
+        """Return whether signature authenticates payload."""
+
+
+@dataclass(frozen=True, slots=True)
+class HMACSigner:
+    """HMAC-SHA-256 signer for deployment manifests."""
+
+    secret: bytes | str
+    algorithm: str = "hmac-sha256"
+
+    def __post_init__(self) -> None:
+        """Reject empty secrets and normalize string secrets to bytes."""
+        secret = self.secret.encode("utf-8") if isinstance(self.secret, str) else self.secret
+        if not secret:
+            raise Deploy("manifest signing secret must be non-empty")
+        object.__setattr__(self, "secret", secret)
+
+    def sign(self, payload: bytes) -> str:
+        """Return the hexadecimal HMAC-SHA-256 signature."""
+        secret = self.secret.encode("utf-8") if isinstance(self.secret, str) else self.secret
+        return hmac.new(secret, payload, hashlib.sha256).hexdigest()
+
+    def verify(self, payload: bytes, signature: str) -> bool:
+        """Constant-time verify a hexadecimal HMAC signature."""
+        return hmac.compare_digest(self.sign(payload), signature)
+
+
 @dataclass(frozen=True, slots=True)
 class Manifest:
     """Self-contained deployment artifact.
@@ -137,6 +177,44 @@ class Manifest:
     policy_ids: tuple[str, ...]
     created_at: datetime
     metadata: Mapping[str, str] = field(default_factory=dict)
+    signature: str | None = None
+    signature_algorithm: str | None = None
+
+    def unsigned_payload(self) -> Mapping[str, Any]:
+        """Return the canonical manifest fields covered by a signature."""
+        return {
+            "domain": self.domain,
+            "bundle_hash": self.bundle_hash,
+            "policy_ids": list(self.policy_ids),
+            "created_at": self.created_at.isoformat(),
+            "metadata": dict(self.metadata),
+        }
+
+    def signing_bytes(self) -> bytes:
+        """Return canonical JSON bytes used for signing and verification."""
+        return json.dumps(
+            self.unsigned_payload(), sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+
+    def signed(self, signer: Signer) -> Manifest:
+        """Return a copy signed by signer."""
+        return Manifest(
+            domain=self.domain,
+            cedar=self.cedar,
+            bundle_hash=self.bundle_hash,
+            policy_ids=self.policy_ids,
+            created_at=self.created_at,
+            metadata=self.metadata,
+            signature=signer.sign(self.signing_bytes()),
+            signature_algorithm=signer.algorithm,
+        )
+
+    def verify(self, signer: Signer) -> None:
+        """Raise Deploy if the manifest signature is invalid."""
+        if not self.signature or self.signature_algorithm != signer.algorithm:
+            raise Deploy("deployment manifest is unsigned or uses an unsupported signer")
+        if not signer.verify(self.signing_bytes(), self.signature):
+            raise Deploy("deployment manifest signature verification failed")
 
     def to_dict(self) -> Mapping[str, Any]:
         """Return a JSON-friendly representation including the Cedar source.
@@ -156,6 +234,8 @@ class Manifest:
             "policy_ids": list(self.policy_ids),
             "created_at": self.created_at.isoformat(),
             "metadata": dict(self.metadata),
+            "signature": self.signature,
+            "signature_algorithm": self.signature_algorithm,
             "cedar": self.cedar,
         }
 
@@ -170,13 +250,10 @@ class Manifest:
             A dict with ``domain``, ``bundle_hash``, ``policy_ids``,
             ``created_at`` and ``metadata`` keys.
         """
-        return {
-            "domain": self.domain,
-            "bundle_hash": self.bundle_hash,
-            "policy_ids": list(self.policy_ids),
-            "created_at": self.created_at.isoformat(),
-            "metadata": dict(self.metadata),
-        }
+        payload = dict(self.unsigned_payload())
+        payload["signature"] = self.signature
+        payload["signature_algorithm"] = self.signature_algorithm
+        return payload
 
 
 @dataclass(frozen=True, slots=True)
@@ -336,6 +413,7 @@ class Bundler:
         policies: Sequence[Kind],
         *,
         metadata: Mapping[str, str] | None = None,
+        signer: Signer | None = None,
     ) -> Manifest:
         """Build a manifest from compiled policies.
 
@@ -344,6 +422,7 @@ class Bundler:
             policies: Policies to include; only those with non-empty
                 Cedar source are considered.
             metadata: Optional deployment metadata.
+            signer: Optional signer for authenticated manifest metadata.
 
         Returns:
             The constructed :class:`Manifest`.
@@ -362,7 +441,7 @@ class Bundler:
             )
         cedar_text = "\n\n".join(policy.cedar for policy in compiled)
         bundle_hash = hashlib.sha256(cedar_text.encode("utf-8")).hexdigest()
-        return Manifest(
+        manifest = Manifest(
             domain=domain,
             cedar=cedar_text,
             bundle_hash=bundle_hash,
@@ -370,6 +449,7 @@ class Bundler:
             created_at=datetime.now(UTC),
             metadata=dict(metadata or {}),
         )
+        return manifest.signed(signer) if signer is not None else manifest
 
     def write_directory(self, manifest: Manifest, directory: Path) -> Path:
         """Write ``manifest`` to ``directory`` atomically.
@@ -488,6 +568,8 @@ class Bundler:
             policy_ids=tuple(data.get("policy_ids", [])),
             created_at=datetime.fromisoformat(data["created_at"]),
             metadata=dict(data.get("metadata", {})),
+            signature=data.get("signature"),
+            signature_algorithm=data.get("signature_algorithm"),
         )
 
     @staticmethod
@@ -746,7 +828,7 @@ class _RetryableTransportError(Deploy):
     """A pinned transport failure that is safe for the client to retry."""
 
 
-class Transport(httpx.BaseTransport):
+class Transport(httpx.BaseTransport):  # type: ignore[misc]
     """An :mod:`httpx` transport that pins each connection to a resolved IP.
 
     The transport refuses to reconnect to the original hostname; if
@@ -1078,6 +1160,14 @@ class Client:
         """
         directory.parent.mkdir(parents=True, exist_ok=True)
         Bundler().write_directory(manifest, directory)
+        logger.info(
+            "deployment succeeded",
+            extra={
+                "domain": manifest.domain,
+                "target_kind": DEPLOYMENT_KIND_LOCAL,
+                "bundle_hash": manifest.bundle_hash,
+            },
+        )
         return Record(
             id=record_id or id(),
             domain=manifest.domain,
@@ -1146,6 +1236,15 @@ class Client:
         attempt = 0
         backoff = self.retry_backoff
         last_error: Deploy | None = None
+        logger.info(
+            "deployment started",
+            extra={
+                "domain": manifest.domain,
+                "target_kind": DEPLOYMENT_KIND_HTTP,
+                "bundle_hash": manifest.bundle_hash,
+                "signed": manifest.signature is not None,
+            },
+        )
         while attempt <= self.max_retries:
             try:
                 with httpx.Client(
@@ -1170,9 +1269,22 @@ class Client:
                                 "body_sha256": response_sha,
                                 "idempotency_key": idem,
                                 "retry_count": str(attempt),
+                                **(
+                                    {"signature_algorithm": manifest.signature_algorithm}
+                                    if manifest.signature_algorithm
+                                    else {}
+                                ),
                             },
                         )
                     if response.status_code in {429, 503} and attempt < self.max_retries:
+                        logger.warning(
+                            "deployment retry scheduled",
+                            extra={
+                                "domain": manifest.domain,
+                                "status_code": response.status_code,
+                                "retry_count": attempt + 1,
+                            },
+                        )
                         attempt += 1
                         if backoff > 0:
                             time.sleep(backoff)
@@ -1203,6 +1315,10 @@ class Client:
                 backoff = min(backoff * 2, 8.0)
                 continue
         if last_error is not None:
+            logger.error(
+                "deployment failed",
+                extra={"domain": manifest.domain, "bundle_hash": manifest.bundle_hash},
+            )
             raise last_error
         raise Deploy("deployment exhausted retries without a result")
 
@@ -1261,8 +1377,10 @@ __all__ = [
     "Bundler",
     "Client",
     "Guard",
+    "HMACSigner",
     "Manifest",
     "Pin",
     "Record",
+    "Signer",
     "Transport",
 ]

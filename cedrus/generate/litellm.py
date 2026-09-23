@@ -54,8 +54,14 @@ import json
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any
 
-import litellm
-from openai import APIError
+try:
+    import litellm
+    from openai import APIError
+except ModuleNotFoundError:  # pragma: no cover - exercised in minimal installs
+    litellm = None
+
+    class APIError(Exception):  # type: ignore[no-redef]
+        """Fallback type used when the optional LLM dependency is absent."""
 
 from cedrus.compile import Intent
 from cedrus.data import Notes, Unresolved, Usage
@@ -309,6 +315,10 @@ class Llm:
 
     def __post_init__(self) -> None:
         """Validate the LiteLLM configuration at construction time."""
+        if litellm is None:
+            raise Generate(
+                "Llm requires the optional dependency; install cedrus[llm]"
+            )
         if not self.model or not self.model.strip():
             raise Generate("Llm requires a non-empty model name")
         if self.timeout <= 0 or self.max_tokens <= 0:
@@ -357,6 +367,10 @@ class Llm:
         if self.fallbacks:
             options["fallbacks"] = list(self.fallbacks)
         try:
+            if litellm is None:
+                raise Generate(
+                    "Llm requires the optional dependency; install cedrus[llm]"
+                )
             response = litellm.completion(**options)
         except APIError as error:
             # ``APIError`` is the base class for every litellm-raised failure:

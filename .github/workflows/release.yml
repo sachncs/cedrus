@@ -34,6 +34,14 @@ jobs:
               print(f'tag {tag} does not match package version {pkg_version}', file=sys.stderr)
               sys.exit(1)
           "
+          python -c "
+          import json, sys
+          tag = '${{ github.ref_name }}'.lstrip('v')
+          site_version = json.load(open('site/package.json', encoding='utf-8'))['version']
+          if site_version != tag:
+              print(f'tag {tag} does not match site version {site_version}', file=sys.stderr)
+              sys.exit(1)
+          "
       - name: Install package
         run: pip install -e ".[test]"
       - name: Run pytest with coverage
@@ -64,11 +72,13 @@ jobs:
         uses: sigstore/cosign-installer@main
         with:
           cosign-release: "v2.4.1"
-      - name: Sign wheel
+      - name: Sign distributions
         run: |
-          cosign sign-blob --yes \
-            --output-signature dist/cedrus-${GITHUB_REF_NAME#v}.whl.sig \
-            dist/cedrus-${GITHUB_REF_NAME#v}.whl
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            cosign sign-blob --yes \
+              --output-signature "$artifact.sig" \
+              "$artifact"
+          done
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

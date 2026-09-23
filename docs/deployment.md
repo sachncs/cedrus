@@ -32,6 +32,25 @@ The `bundle_hash` is the SHA-256 digest of `bundle.cedar`. The
 manifest is committed alongside the bundle so consumers can verify
 integrity after transport.
 
+### Authenticated manifests
+
+SHA-256 detects accidental corruption but does not authenticate a bundle.
+For production receivers, sign manifests with HMACSigner before writing or
+pushing them:
+
+    import os
+
+    from cedrus import Bundler, HMACSigner
+
+    signer = HMACSigner(os.environ["CEDRUS_BUNDLE_SIGNING_SECRET"])
+    manifest = Bundler().build("hr", policies, signer=signer)
+    manifest.verify(signer)
+
+The signature covers the canonical manifest metadata, including the bundle
+hash, domain, policy IDs, timestamp, and deployment metadata. The secret is
+never serialized. Receivers must verify the signature before accepting the
+bundle and should use the same idempotency key to deduplicate retries.
+
 A `Record` row is also written to `deployments` capturing the
 deployment id (a fresh `cedrus.utils.id()`), target path or URL,
 target kind (`local` or `http`), bundle hash, and a bounded subset

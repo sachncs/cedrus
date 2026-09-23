@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">cedrus</h1>
-  <p align="center">The Compiler for Authorization Intent — v0.7.0</p>
+  <p align="center">The Compiler for Authorization Intent — v0.8.0</p>
   <p align="center">
     <a href="#installation"><img src="https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python" alt="Python"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
@@ -62,7 +62,7 @@ Beyond the drafting surface, cedrus ships:
   (`init` / `domain` / `requirement` / `policy` / `export` /
   `check` / `verify` / `deploy`).
 
-v0.7.0 is the first release after a full rewrite of the data
+v0.8.0 is the production-readiness release after the full rewrite of the data
 model and the verifier. Every backward-compat shim from 0.6.0 is
 gone (the `Workspace` alias, the `migrate` subcommand, the
 `compile_intent` / `verify_policies` / `extract_entity_types` /
@@ -70,12 +70,12 @@ gone (the `Workspace` alias, the `migrate` subcommand, the
 `validate_headers` free-function wrappers, the
 `cedrus.data.persist` duplicate module). The full what + why
 of every change is in [CHANGELOG.md](CHANGELOG.md); the test
-suite grew from ~100 tests across ~10 modules to **561 tests
-across 21 modules, 91% line coverage**. The 0.4.0 / 0.5.0 / 0.6.0
+suite now contains **567 tests across 21 modules with 91.18% line
+coverage**. The 0.4.0 / 0.5.0 / 0.6.0
 history is preserved below.
 
 The roadmap captures the direction (multi-region replication,
-collaborative editing, plugin runtime) but no version after 0.7.0
+collaborative editing, plugin runtime) remain future work.
 has been cut yet. The TODO list in `todo.md` carries the
 historical rebuild plan and is kept for archaeology only.
 
@@ -150,13 +150,16 @@ git clone https://github.com/sachncs/cedrus.git
 cd cedrus
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[test]"
+pip install -e ".[test,llm]"
 ```
 
 ### Run from a release
 
 ```bash
 pip install cedrus
+
+# Install optional LiteLLM-backed generation support.
+pip install "cedrus[llm]"
 ```
 
 **Requirements**: Python 3.11+ (see `pyproject.toml`). The runtime
@@ -164,7 +167,7 @@ dependencies declared in `pyproject.toml` are:
 
 - `cedarpy` (the Python binding to the Cedar policy engine),
 - `httpx` (HTTP client used by `Client` and the DNS-pinned transport), and
-- `litellm` (the LLM provider abstraction).
+- `litellm` is optional and is installed with the `llm` extra.
 
 ---
 
@@ -402,7 +405,7 @@ cedrus/
 │   ├── python-api.md
 │   └── verification.md
 ├── examples/                        # runnable end-to-end examples
-├── tests/                           # 561 tests across 21 files
+├── tests/                           # 567 tests across 21 files
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
@@ -444,7 +447,7 @@ cedrus/
 ```
 
 The test suite has 564 tests across 20 modules. Coverage is
-**91%** (274 / 2968 stmts uncovered). The remaining gaps are mostly
+**91.18%** (267 / 3026 stmts uncovered). The remaining gaps are mostly
 defensive error paths in `deploy.py` (HTTP transport edge cases),
 the verifier AST helper edge cases, and `space.apply` failure
 paths. See [docs/coverage.md](docs/coverage.md) for the per-module
@@ -467,12 +470,10 @@ single `cedrus` package with one console script (`cedrus`).
 ## Release
 
 The release workflow (`.github/workflows/release.yml`) is the
-documented contract for a future tagged release. As of the current
-revision, **no GitHub Release or PyPI publication has been cut**:
-the package is at 0.7.0 in source, but the public surfaces are not
-yet wired to that tag. The changelog lists the historical roadmap
-(0.4.0 → 0.7.0) for context; no tarball, wheel, SBOM, or signature
-artifact is currently published.
+release contract for tagged 0.8.0 and later releases. It validates
+the version, runs the supported-Python test matrix, builds the
+distributions, creates an SBOM, signs artifacts with Sigstore, and
+publishes through PyPI trusted publishing.
 
 When a tagged release is eventually produced, each release will:
 

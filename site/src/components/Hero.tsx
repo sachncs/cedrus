@@ -1,4 +1,4 @@
-import { cedarOutput } from "../content/data.ts";
+import { cedarOutput, site } from "../content/data.ts";
 
 function escape(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -97,7 +97,7 @@ export default function Hero() {
             className="group inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-[12px] text-ink-200 hover:bg-white/[0.05] transition-colors"
           >
             <span className="dot shrink-0" />
-            <span className="font-mono text-[11px] tracking-wide text-cedar-300 shrink-0">v0.7.0</span>
+            <span className="font-mono text-[11px] tracking-wide text-cedar-300 shrink-0">{site.version}</span>
             <span className="text-ink-500 shrink-0">·</span>
             <span className="truncate">First release after the data-model rewrite</span>
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-ink-400 group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
@@ -149,8 +149,8 @@ export default function Hero() {
         {/* Quick stats */}
         <div className="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] sm:grid-cols-4 animate-fade-up [animation-delay:300ms]">
           {[
-            { v: "561", l: "Tests" },
-            { v: "91%", l: "Coverage" },
+            { v: "567", l: "Tests" },
+            { v: "91.18%", l: "Coverage" },
             { v: "3.11+", l: "Python" },
             { v: "Apache 2.0", l: "License" },
           ].map((s) => (
