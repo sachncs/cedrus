@@ -41,7 +41,7 @@ dev = [
     "twine>=5",
 ]
 llm = [
-    "litellm>=1,<2",
+    "litellm>=1.102.0,<2",
 ]
 test = [
     "pytest>=8",
