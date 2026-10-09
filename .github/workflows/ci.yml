@@ -134,7 +134,7 @@ jobs:
           python -m pip install ".[llm]"
           pip-audit
       - name: Scan repository for secrets
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
 
   docs:
     name: Verify documentation links
